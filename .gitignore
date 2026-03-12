@@ -5,3 +5,9 @@
 *.set
 *.mat
 *.csv
+
+other/
+power/
+topomaps/
+ERP/__pycache__/
+.DS_Store
