@@ -2,7 +2,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import mne
-from mne.time_frequency import tfr_morlet
+from mne.time_frequency import tfr_multitaper
 from typing import List, Tuple, Optional, Any
 import scipy.stats
 import scipy
@@ -137,7 +137,7 @@ def run_cluster_permutation_test(control_files, treatment_files, get_subject_erp
     
     if use_adjacency:
         picks = [i for i, ch in enumerate(standard_chans) if ch not in exclude_chans]
-        info_subset = erp_control_template.copy().pick_channels(
+        info_subset = erp_control_template.copy().pick(
             [standard_chans[i] for i in picks]
         ).info
         
@@ -270,7 +270,7 @@ def run_cluster_permutation_test(control_files, treatment_files, get_subject_erp
                     t_map_no_ref = t_map[picks]
                     
                     if info_subset is None:
-                        info_subset = erp_control_template.copy().pick_channels(
+                        info_subset = erp_control_template.copy().pick(
                             [standard_chans[i] for i in picks]
                         ).info
                     
@@ -334,33 +334,35 @@ def extract_evokeds_epochs(
     """
     task_evokeds = []
     base_evokeds = []
+    base_epochs_list = []
     epochs_t = None
     
     for f_name in file_list:
         try:
             raw = mne.io.read_raw_eeglab(os.path.join(base_path, f_name), preload=True)
-            raw.pick_channels(standard_channels, ordered=True)
+            raw.pick(standard_channels)
             events, event_id = mne.events_from_annotations(raw)
-            epochs_t = mne.Epochs(raw, events, event_id[trigger_id], tmin=-2, tmax=2, baseline=(-0.2, 0), preload=True, verbose=False)
+            epochs_t = mne.Epochs(raw, events, event_id[trigger_id], tmin=-5, tmax=5, baseline=(-0.2, 0), preload=True, verbose=False)
             n_events = len(epochs_t)
             print(f"File: {f_name} | Count of '{trigger_id}' events: {n_events}")
             task_evokeds.append(epochs_t.average())
 
             sub_id = f_name.split('_')[0]
-            base_f = f"Filter100_{sub_id}_baseline_.set"
+            base_f = f"{sub_id}_baseline_ICA.set"
             base_path_full = os.path.join(base_path_ica, base_f)
             
             if os.path.exists(base_path_full):
                 raw_b = mne.io.read_raw_eeglab(base_path_full, preload=True)
-                raw_b.pick_channels(standard_channels, ordered=True)
+                raw_b.pick(standard_channels)
                 b_events = mne.make_fixed_length_events(raw_b, duration=1.0)
-                epochs_b = mne.Epochs(raw_b, b_events, tmin=-2, tmax=2, baseline=(-0.2, 0), preload=True, verbose=False)
+                epochs_b = mne.Epochs(raw_b, b_events, tmin=-5, tmax=5, baseline=(-0.2, 0), preload=True, verbose=False)
+                base_epochs_list.append(epochs_b)
                 base_evokeds.append(epochs_b.average())
                 
         except Exception as e:
             print(f"-----------------------------Error processing {f_name}: {e}")
     
-    return task_evokeds, base_evokeds, epochs_t
+    return task_evokeds, base_evokeds, epochs_t, base_epochs_list
 
 
 def plot_tfr_bands(
@@ -419,8 +421,9 @@ def plot_tfr_bands(
     # Calculate TFR
     freqs = np.arange(*freqs_range)
     n_cycles = freqs / 2.
-    tfr = tfr_morlet(epochs, freqs=freqs, n_cycles=n_cycles, 
-                     return_itc=False, average=True)
+    # Using epochs.compute_tfr() instead of legacy tfr_morlet
+    tfr = epochs.compute_tfr(method="morlet", freqs=freqs, n_cycles=n_cycles, 
+                             return_itc=False, average=True, decim=3)
     
     if isplot:
         # Determine which channels to plot
@@ -767,7 +770,7 @@ def get_subject_erp(file_list, target_sub_id, trigger_id='100'):
     for f_name in sub_files:
         try:
             raw = mne.io.read_raw_eeglab(os.path.join(base_path, f_name), preload=True)
-            raw.pick_channels(standard_chans, ordered=True)
+            raw.pick(standard_chans)
             events, event_id = mne.events_from_annotations(raw)
             
             if trigger_id in event_id:

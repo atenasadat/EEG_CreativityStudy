@@ -5,9 +5,13 @@
 *.set
 *.mat
 *.csv
+*.txt
 
 other/
 power/
 topomaps/
 ERP/__pycache__/
 .DS_Store
+SSH FS - carc/
+
+.venv/
