@@ -1,4 +1,12 @@
+"""ERP helper functions for insight-locked analyses.
+
+This file supports the main ERP notebook by loading aha epochs, extracting
+evoked responses, computing TFRs, and running cluster-permutation utilities.
+"""
+
 import os
+
+os.environ.setdefault("NUMBA_DISABLE_JIT", "1")
 import numpy as np
 import matplotlib.pyplot as plt
 import mne
@@ -7,6 +15,7 @@ from typing import List, Tuple, Optional, Any
 import scipy.stats
 import scipy
 from mne.stats import permutation_cluster_1samp_test
+from erp_shared import get_files_with_trigger, read_eeg_file
 
 
 standard_chans = [
@@ -15,41 +24,26 @@ standard_chans = [
 ]
 base_path = '/Users/athenasaghi/Desktop/CleanDATA/clean/'
 
+INTERPOLATED_BASELINE_FILES = {
+    "P10": "P10_baseline_ICA_interpolated.set",
+    "P15": "P15_baseline_ICA_interpolated.set",
+    "P20": "P20_baseline_ICA_interpolated.set",
+    "P23": "P23_baseline_ICA_interpolated.set",
+}
+
 
 DEFAULT_BANDS = [
-    ('Delta', 1, 4), 
-    ('Theta', 4, 8), 
-    ('Alpha', 8, 13), 
+    ('Delta', 1, 4),
+    ('Theta', 4, 8),
+    ('Alpha', 8, 13),
     ('Beta', 13, 30),
     ('Low Gamma', 30, 45),
     ('High Gamma', 55, 90)
 ]
 
 def get_files_with_event_100(base_path, trigger_id='100'):
-    """Scan directory for .set files containing event trigger_id"""
-    control_files = []
-    treatment_files = []
-    
-    for filename in os.listdir(base_path):
-        if filename.endswith('.set'):
-            filepath = os.path.join(base_path, filename)
-            try:
-                raw = mne.io.read_raw_eeglab(filepath, preload=False, verbose=False)
-                events, event_id = mne.events_from_annotations(raw, verbose=False)
-                
-                # Check if trigger_id exists in event_id dictionary (as a string key)
-                if trigger_id in event_id:
-                    if 'control' in filename:
-                        control_files.append(filename)
-                    elif 'treatment' in filename:
-                        treatment_files.append(filename)
-                else:
-                    print(f"✗ Trigger '{trigger_id}' not in {filename}. Available: {list(event_id.keys())}")
-                    
-            except Exception as e:
-                print(f"Error reading {filename}: {e}")
-    
-    return sorted(control_files), sorted(treatment_files)
+    """Shared trigger-based EEG file reader used by notebooks and scripts."""
+    return get_files_with_trigger(base_path, trigger_id=trigger_id, verbose=True)
 
 def run_cluster_permutation_test(control_files, treatment_files, get_subject_erp, 
                                   standard_chans, n_permutations=32768, alpha=0.05,
@@ -339,8 +333,7 @@ def extract_evokeds_epochs(
     
     for f_name in file_list:
         try:
-            raw = mne.io.read_raw_eeglab(os.path.join(base_path, f_name), preload=True)
-            raw.pick(standard_channels)
+            raw = read_eeg_file(f_name, base_path=base_path, preload=True, channels=standard_channels)
             events, event_id = mne.events_from_annotations(raw)
             epochs_t = mne.Epochs(raw, events, event_id[trigger_id], tmin=-5, tmax=5, baseline=(-0.2, 0), preload=True, verbose=False)
             n_events = len(epochs_t)
@@ -348,12 +341,19 @@ def extract_evokeds_epochs(
             task_evokeds.append(epochs_t.average())
 
             sub_id = f_name.split('_')[0]
-            base_f = f"{sub_id}_baseline_ICA.set"
+            base_f = INTERPOLATED_BASELINE_FILES.get(
+                sub_id,
+                f"{sub_id}_baseline_ICA.set",
+            )
             base_path_full = os.path.join(base_path_ica, base_f)
             
             if os.path.exists(base_path_full):
-                raw_b = mne.io.read_raw_eeglab(base_path_full, preload=True)
-                raw_b.pick(standard_channels)
+                raw_b = read_eeg_file(
+                    base_f,
+                    base_path=base_path_ica,
+                    preload=True,
+                    channels=standard_channels,
+                )
                 b_events = mne.make_fixed_length_events(raw_b, duration=1.0)
                 epochs_b = mne.Epochs(raw_b, b_events, tmin=-5, tmax=5, baseline=(-0.2, 0), preload=True, verbose=False)
                 base_epochs_list.append(epochs_b)
@@ -769,8 +769,7 @@ def get_subject_erp(file_list, target_sub_id, trigger_id='100'):
     
     for f_name in sub_files:
         try:
-            raw = mne.io.read_raw_eeglab(os.path.join(base_path, f_name), preload=True)
-            raw.pick(standard_chans)
+            raw = read_eeg_file(f_name, base_path=base_path, preload=True, channels=standard_chans)
             events, event_id = mne.events_from_annotations(raw)
             
             if trigger_id in event_id:
