@@ -6,6 +6,8 @@
 *.mat
 *.csv
 *.txt
+*.py[cod]
+__pycache__/
 
 other/
 power/
