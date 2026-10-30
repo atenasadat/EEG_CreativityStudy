@@ -1,0 +1,312 @@
+{
+ "stats": {
+  "wallas_mean": {
+   "tag": "wallas_mean",
+   "N": 14,
+   "stats": [
+    {
+     "pathway": "Theta Frontal->Parietal",
+     "mean_unassisted": 0.15127,
+     "mean_llm": 0.17397,
+     "change_pct": 15.00468,
+     "N": 14,
+     "chi2_paper": 2.53766,
+     "df_paper": 4,
+     "p_paper": 0.6379,
+     "q_paper": 0.814
+    },
+    {
+     "pathway": "Theta Frontal->Occipital",
+     "mean_unassisted": 0.16793,
+     "mean_llm": 0.17422,
+     "change_pct": 3.7494,
+     "N": 14,
+     "chi2_paper": 1.99283,
+     "df_paper": 4,
+     "p_paper": 0.73708,
+     "q_paper": 0.814
+    },
+    {
+     "pathway": "Theta Parietal->Frontal",
+     "mean_unassisted": 0.18641,
+     "mean_llm": 0.12024,
+     "change_pct": -35.49558,
+     "N": 14,
+     "chi2_paper": 16.16675,
+     "df_paper": 4,
+     "p_paper": 0.0028,
+     "q_paper": 0.00885
+    },
+    {
+     "pathway": "Theta Parietal->Occipital",
+     "mean_unassisted": 0.20468,
+     "mean_llm": 0.13786,
+     "change_pct": -32.64507,
+     "N": 14,
+     "chi2_paper": 13.62571,
+     "df_paper": 4,
+     "p_paper": 0.00859,
+     "q_paper": 0.01718
+    },
+    {
+     "pathway": "Theta Occipital->Frontal",
+     "mean_unassisted": 0.13962,
+     "mean_llm": 0.09723,
+     "change_pct": -30.3586,
+     "N": 14,
+     "chi2_paper": 18.6375,
+     "df_paper": 4,
+     "p_paper": 0.00093,
+     "q_paper": 0.00556
+    },
+    {
+     "pathway": "Theta Occipital->Parietal",
+     "mean_unassisted": 0.15421,
+     "mean_llm": 0.10827,
+     "change_pct": -29.78996,
+     "N": 14,
+     "chi2_paper": 11.84597,
+     "df_paper": 4,
+     "p_paper": 0.01853,
+     "q_paper": 0.03177
+    },
+    {
+     "pathway": "Alpha Frontal->Parietal",
+     "mean_unassisted": 0.13877,
+     "mean_llm": 0.15618,
+     "change_pct": 12.54641,
+     "N": 14,
+     "chi2_paper": 1.9434,
+     "df_paper": 4,
+     "p_paper": 0.74617,
+     "q_paper": 0.814
+    },
+    {
+     "pathway": "Alpha Frontal->Occipital",
+     "mean_unassisted": 0.15055,
+     "mean_llm": 0.14878,
+     "change_pct": -1.17663,
+     "N": 14,
+     "chi2_paper": 0.76933,
+     "df_paper": 4,
+     "p_paper": 0.94251,
+     "q_paper": 0.94251
+    },
+    {
+     "pathway": "Alpha Parietal->Frontal",
+     "mean_unassisted": 0.18082,
+     "mean_llm": 0.11739,
+     "change_pct": -35.07939,
+     "N": 14,
+     "chi2_paper": 16.05151,
+     "df_paper": 4,
+     "p_paper": 0.00295,
+     "q_paper": 0.00885
+    },
+    {
+     "pathway": "Alpha Parietal->Occipital",
+     "mean_unassisted": 0.18978,
+     "mean_llm": 0.1211,
+     "change_pct": -36.18997,
+     "N": 14,
+     "chi2_paper": 14.37839,
+     "df_paper": 4,
+     "p_paper": 0.00618,
+     "q_paper": 0.01483
+    },
+    {
+     "pathway": "Alpha Occipital->Frontal",
+     "mean_unassisted": 0.13083,
+     "mean_llm": 0.0878,
+     "change_pct": -32.88593,
+     "N": 14,
+     "chi2_paper": 19.53116,
+     "df_paper": 4,
+     "p_paper": 0.00062,
+     "q_paper": 0.00556
+    },
+    {
+     "pathway": "Alpha Occipital->Parietal",
+     "mean_unassisted": 0.14088,
+     "mean_llm": 0.09533,
+     "change_pct": -32.32751,
+     "N": 14,
+     "chi2_paper": 11.185,
+     "df_paper": 4,
+     "p_paper": 0.02456,
+     "q_paper": 0.03684
+    }
+   ],
+   "pids_used": [
+    "P10",
+    "P13",
+    "P14",
+    "P15",
+    "P16",
+    "P17",
+    "P18",
+    "P20",
+    "P22",
+    "P4",
+    "P5",
+    "P6",
+    "P7",
+    "P9"
+   ]
+  },
+  "wallas_pca": {
+   "tag": "wallas_pca",
+   "N": 14,
+   "stats": [
+    {
+     "pathway": "Theta Frontal->Parietal",
+     "mean_unassisted": 0.10237,
+     "mean_llm": 0.12425,
+     "change_pct": 21.37443,
+     "N": 14,
+     "chi2_paper": 5.14724,
+     "df_paper": 4,
+     "p_paper": 0.27252,
+     "q_paper": 0.41254
+    },
+    {
+     "pathway": "Theta Frontal->Occipital",
+     "mean_unassisted": 0.1509,
+     "mean_llm": 0.13339,
+     "change_pct": -11.60401,
+     "N": 14,
+     "chi2_paper": 4.92647,
+     "df_paper": 4,
+     "p_paper": 0.29493,
+     "q_paper": 0.41254
+    },
+    {
+     "pathway": "Theta Parietal->Frontal",
+     "mean_unassisted": 0.10261,
+     "mean_llm": 0.08607,
+     "change_pct": -16.12058,
+     "N": 14,
+     "chi2_paper": 3.70795,
+     "df_paper": 4,
+     "p_paper": 0.44697,
+     "q_paper": 0.4876
+    },
+    {
+     "pathway": "Theta Parietal->Occipital",
+     "mean_unassisted": 0.15059,
+     "mean_llm": 0.1154,
+     "change_pct": -23.36843,
+     "N": 14,
+     "chi2_paper": 7.11177,
+     "df_paper": 4,
+     "p_paper": 0.1301,
+     "q_paper": 0.2602
+    },
+    {
+     "pathway": "Theta Occipital->Frontal",
+     "mean_unassisted": 0.09042,
+     "mean_llm": 0.07989,
+     "change_pct": -11.64857,
+     "N": 14,
+     "chi2_paper": 2.9306,
+     "df_paper": 4,
+     "p_paper": 0.56951,
+     "q_paper": 0.56951
+    },
+    {
+     "pathway": "Theta Occipital->Parietal",
+     "mean_unassisted": 0.12605,
+     "mean_llm": 0.08427,
+     "change_pct": -33.14672,
+     "N": 14,
+     "chi2_paper": 16.43094,
+     "df_paper": 4,
+     "p_paper": 0.00249,
+     "q_paper": 0.01495
+    },
+    {
+     "pathway": "Alpha Frontal->Parietal",
+     "mean_unassisted": 0.08726,
+     "mean_llm": 0.10294,
+     "change_pct": 17.9648,
+     "N": 14,
+     "chi2_paper": 4.44296,
+     "df_paper": 4,
+     "p_paper": 0.34936,
+     "q_paper": 0.41924
+    },
+    {
+     "pathway": "Alpha Frontal->Occipital",
+     "mean_unassisted": 0.13443,
+     "mean_llm": 0.11029,
+     "change_pct": -17.95866,
+     "N": 14,
+     "chi2_paper": 8.57385,
+     "df_paper": 4,
+     "p_paper": 0.07268,
+     "q_paper": 0.21804
+    },
+    {
+     "pathway": "Alpha Parietal->Frontal",
+     "mean_unassisted": 0.09974,
+     "mean_llm": 0.0805,
+     "change_pct": -19.28658,
+     "N": 14,
+     "chi2_paper": 4.79113,
+     "df_paper": 4,
+     "p_paper": 0.30941,
+     "q_paper": 0.41254
+    },
+    {
+     "pathway": "Alpha Parietal->Occipital",
+     "mean_unassisted": 0.14056,
+     "mean_llm": 0.10175,
+     "change_pct": -27.61054,
+     "N": 14,
+     "chi2_paper": 8.64912,
+     "df_paper": 4,
+     "p_paper": 0.07049,
+     "q_paper": 0.21804
+    },
+    {
+     "pathway": "Alpha Occipital->Frontal",
+     "mean_unassisted": 0.08492,
+     "mean_llm": 0.07008,
+     "change_pct": -17.47388,
+     "N": 14,
+     "chi2_paper": 7.20298,
+     "df_paper": 4,
+     "p_paper": 0.12554,
+     "q_paper": 0.2602
+    },
+    {
+     "pathway": "Alpha Occipital->Parietal",
+     "mean_unassisted": 0.11221,
+     "mean_llm": 0.07406,
+     "change_pct": -34.00412,
+     "N": 14,
+     "chi2_paper": 16.91622,
+     "df_paper": 4,
+     "p_paper": 0.00201,
+     "q_paper": 0.01495
+    }
+   ],
+   "pids_used": [
+    "P10",
+    "P13",
+    "P14",
+    "P15",
+    "P16",
+    "P17",
+    "P18",
+    "P20",
+    "P22",
+    "P4",
+    "P5",
+    "P6",
+    "P7",
+    "P9"
+   ]
+  }
+ }
+}
