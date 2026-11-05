@@ -50,7 +50,7 @@ M = X.mean(0); v = float(np.ceil(np.abs(M).max() * 2) / 2)
 im = ax.pcolormesh(t[tm], f, M, cmap='RdBu_r', vmin=-v, vmax=v, shading='nearest')
 ax.contour(t[tm], f, cl[k].astype(float), levels=[0.5], colors='k', linewidths=1.2)
 ax.set_xlabel('Time relative to insight (s)'); ax.set_ylabel('Frequency (Hz)')
-ax.set_title('Frontal, aha $-$ random moments (both conditions)', fontsize=10.5)
+ax.set_title('Frontal, aha minus random moments', fontsize=10.5)
 cb = fig.colorbar(im, ax=ax, fraction=0.05, pad=0.03); cb.set_label('Power difference (dB)')
 fi, ti = np.where(cl[k])
 ax.text(0.02, 0.97, f'cluster {f[fi.min()]:.0f}-{f[fi.max()]:.0f} Hz, {t[tm][ti.min()]:.2f} to {t[tm][ti.max()]:.2f} s, '
@@ -94,8 +94,8 @@ if POOLED:  # stars at one height above all dots: FDR-adjusted p < .05 (*), < .0
     ax.set_ylim(top=top + 0.45)
 ax.axhline(0, color='0.3', lw=0.7)
 ax.set_xticks(range(len(ROIS))); ax.set_xticklabels(list(ROIS))
-ax.set_ylabel('Theta, aha $-$ random (dB)')
-ax.set_title('Theta (4-8 Hz), $-2$ to 0 s before the insight', fontsize=10.5)
+ax.set_ylabel('Theta, aha minus random (dB)')
+ax.set_title('Theta (4-8 Hz), 2 s before the insight', fontsize=10.5)
 if not POOLED:
     ax.legend(frameon=False, fontsize=8.5, loc='lower left')
 for s in ['top', 'right']:
