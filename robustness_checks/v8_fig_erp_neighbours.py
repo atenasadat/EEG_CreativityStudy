@@ -1,6 +1,5 @@
-"""Supplementary figure: the channel neighbours used by the ERP cluster test (v08) next to the earlier file-order
-version. Lines are neighbour links; filled circles are the channels of the pre-aha cluster found with that
-definition. Input: OUT_DIR/v8_erp_spatial.json, v8_erp_neighbours.json (from v8_erp_spatial.py).
+"""Appendix figure: the channel neighbours used by the ERP cluster test (v08). Lines are neighbour links; filled
+circles are the channels of the pre-aha cluster. Input: OUT_DIR/v8_erp_spatial.json, v8_erp_neighbours.json (from v8_erp_spatial.py).
 Output: OUT_DIR/figures/fig_erp_neighbours.{png,pdf}"""
 import json
 
@@ -37,11 +36,9 @@ def f(p):
     return f'{p:.3f}'.lstrip('0')
 
 
-panels = [(NB, R['spatial (Delaunay) | pre -0.5..0'], R['spatial (Delaunay) | full -0.5..0.5'],
-           'A  Spatial neighbours: Delaunay triangulation (used)'),
-          (order, R['file order (v7) | pre -0.5..0'], R['file order (v7) | full -0.5..0.5'],
-           'B  Order in the data file (earlier version)')]
-fig, axes = plt.subplots(1, 2, figsize=(8.6, 5.0))
+panels = [(NB, R['spatial (Delaunay) | pre -0.5..0'], R['spatial (Delaunay) | full -0.5..0.5'], '')]
+fig, axes = plt.subplots(1, 1, figsize=(4.6, 4.9))
+axes = [axes]
 for ax, (nb, pre, full, title) in zip(axes, panels):
     clus = set(pre['channels'])
     deg = np.mean([len(v) for v in nb.values()])
@@ -61,12 +58,11 @@ for ax, (nb, pre, full, title) in zip(axes, panels):
         ax.scatter(*v, s=150, color=ACC if c in clus else 'white', edgecolor=ACC if c in clus else INK,
                    lw=0.8, zorder=2)
         ax.text(v[0] + 0.06 * rad, v[1] - 0.06 * rad, c, ha='left', va='top', fontsize=8, color=INK)
-    ax.set_title(f'{title}\n{deg:.1f} neighbours per channel on average\n'
-                 f'cluster p = {f(pre["p"])} (search $-0.5$ to 0 s), {f(full["p"])} ($-0.5$ to $+0.5$ s)',
+    ax.set_title(f'Delaunay triangulation of the electrode positions\n{deg:.1f} neighbours per channel on average',
                  fontsize=9.5, color=INK, loc='left')
     ax.set_xlim(-rad * 1.08, rad * 1.08); ax.set_ylim(-rad * 1.08, rad * 1.18)
     ax.set_aspect('equal'); ax.axis('off')
-fig.subplots_adjust(left=0.01, right=0.99, top=0.80, bottom=0.02, wspace=0.05)
+fig.subplots_adjust(left=0.01, right=0.99, top=0.86, bottom=0.02)
 for ext in ('png', 'pdf'):
     plt.savefig(f'{FIGDIR}/fig_erp_neighbours.{ext}', dpi=220)
 print('saved', FIGDIR)
