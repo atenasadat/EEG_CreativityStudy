@@ -1,6 +1,7 @@
 """Option A: pre-aha ERP cluster (analysis 1) and per-person + held-out (analysis 2).
 
-Data: the cleaned files (EEG_DATA), with the 60 Hz notch on the 6 line-noise files (notch_patch).
+Data: the cleaned files (EEG_DATA), no notch. NOTCH=1 adds the v7 60 Hz notch on the 6 line-noise files
+(notch_patch.py), as a check.
 Older note on the data mix:
   - 2 files postcleaning6 (notch before ICA, same manual rejection)
   - 5 files postcleaning1 with 60 Hz notch applied at read-time (notch_patch_optA)
@@ -18,8 +19,9 @@ import scipy.stats as st
 import mne
 from mne.stats import permutation_cluster_1samp_test
 
-# notch patch MUST be imported before any mne.io.read_raw_eeglab call
-import notch_patch  # noqa: F401
+# notch patch (only with NOTCH=1) must be imported before any mne.io.read_raw_eeglab call
+if os.environ.get('NOTCH') == '1':
+    import notch_patch  # noqa: F401
 from common import *
 
 mne.set_log_level('ERROR')
