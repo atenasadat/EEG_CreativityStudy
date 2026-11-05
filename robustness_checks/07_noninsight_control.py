@@ -9,7 +9,8 @@ Count matching: in every recording, the number of random epochs = the number of 
   (so per participant x condition the count equals that participant's aha count in that condition; task is
   matched too). Positions drawn uniformly from valid samples, without replacement within a draw.
 1,000 draws, numpy default_rng(seed=20261006). Primary per-participant non-insight ERP = average over draws.
-ROI = F3/C3/P3, window -450..-297 ms (samples -135..-89 at 300 Hz), not re-selected.
+ROI = F3/C3/P3 (v7) or the channels in ROI_CH (v08: the spatial cluster), window -450..-297 ms, not re-selected.
+C-d S (v08): spatial (Delaunay) neighbours and search -0.5..0 s, as in the primary test.
 Tests:
   C-a Wilcoxon (two-sided, N = 15) Unassisted vs LLM on the primary non-insight ROI values.
   C-b per draw, the same Wilcoxon; % of draws with p < .05 (and % with p < .05 in the aha direction).
@@ -19,6 +20,7 @@ Tests:
 Outputs: outputs/07_noninsight_results.json, 07_noninsight_draws.csv, 07_noninsight_erps.npz, 07_noninsight.log
 """
 import json
+import os
 import numpy as np
 import pandas as pd
 import scipy.stats as st
@@ -39,7 +41,8 @@ ep_rec = pd.read_csv(f'{OUT}/03_epochs_per_recording.csv')
 nt = len(times); half = (nt - 1) // 2          # 150 samples
 base = (times >= -0.2 - 1e-9) & (times <= 0 + 1e-9)
 win = (times >= -0.4501) & (times <= -0.2966)
-roi = [STANDARD_CHANS.index(c) for c in ['F3', 'C3', 'P3']]
+ROI_CH = os.environ.get('ROI_CH', 'F3,C3,P3').split(',')   # v08: the 8 channels of the spatial cluster
+roi = [STANDARD_CHANS.index(c) for c in ROI_CH]
 
 recs = [r for r in list_recordings() if r['pid'] in sample]
 pcs = [(p, c) for p in sample for c in ['control', 'treatment']]
@@ -143,15 +146,18 @@ adj19, _ = mne.channels.find_ch_adjacency(raw0.info, 'eeg')
 scalp_idx = [STANDARD_CHANS.index(c) for c in SCALP_CHANS]
 thr = st.t.ppf(0.975, N - 1)
 
-def clus(A, R, chans_idx, adjacency, label):
+def clus(A, R, chans_idx, adjacency, label, tmask=None):
     Xd = np.transpose(A - R, (0, 2, 1))[:, :, chans_idx]
+    tt = times if tmask is None else times[tmask]
+    if tmask is not None:
+        Xd = Xd[:, tmask]
     names = [STANDARD_CHANS[i] for i in chans_idx]
     t_obs, cl, pv, H0 = permutation_cluster_1samp_test(Xd, n_permutations=32768, threshold=thr, tail=0,
                                                        adjacency=adjacency, out_type='mask', seed=0, verbose='ERROR')
     out = []
     for i in np.argsort(pv)[:5]:
         ti, ci = np.where(cl[i])
-        out.append(dict(p=float(pv[i]), t_start=float(times[ti.min()]), t_end=float(times[ti.max()]),
+        out.append(dict(p=float(pv[i]), t_start=float(tt[ti.min()]), t_end=float(tt[ti.max()]),
                         channels=[names[c] for c in np.unique(ci)], mean_T=float(t_obs[cl[i]].mean()),
                         sign='aha > non-insight' if t_obs[cl[i]].mean() > 0 else 'aha < non-insight'))
     print(label, [(round(o['p'], 4), round(o['t_start'], 3), round(o['t_end'], 3), o['channels'], round(o['mean_T'], 2)) for o in out])
@@ -159,7 +165,8 @@ def clus(A, R, chans_idx, adjacency, label):
 
 res['C_d'] = {}
 for c, A, R in [('Unassisted', AHA_C, RC), ('LLM-assisted', AHA_T, RT)]:
-    res['C_d'][c] = dict(M_mne_adjacency_19ch=clus(A, R, scalp_idx, adj19, f'{c} M'),
+    res['C_d'][c] = dict(S_spatial_19ch_pre=clus(A, R, scalp_idx, adj19, f'{c} S pre', times <= 1e-9),
+                         M_mne_adjacency_19ch=clus(A, R, scalp_idx, adj19, f'{c} M'),
                          R_repo_lattice_21ch=clus(A, R, list(range(21)), None, f'{c} R'))
 json.dump(res, open(f'{OUT}/07_noninsight_results.json', 'w'), indent=1)
 print(json.dumps({k: v for k, v in res.items() if k != 'C_d'}, indent=1))

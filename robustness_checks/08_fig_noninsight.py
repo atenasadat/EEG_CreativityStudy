@@ -3,6 +3,7 @@ Input : outputs/03_participant_erps.npz, outputs/07_noninsight_erps.npz, outputs
 Output: Figures/v04/fig_noninsight_control.{png,pdf}
 """
 import json
+import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -16,7 +17,8 @@ plt.rcParams.update({'font.family': 'serif', 'font.serif': ['STIXGeneral', 'Deja
 a = np.load(f'{OUT}/03_participant_erps.npz'); r = np.load(f'{OUT}/07_noninsight_erps.npz')
 S = json.load(open(f'{OUT}/07_noninsight_results.json'))
 times = a['times']; chans = list(a['chans'])
-roi = [chans.index(c) for c in ['F3', 'C3', 'P3']]
+ROI_CH = os.environ.get('ROI_CH', 'F3,C3,P3').split(',')   # v08: the spatial cluster
+roi = [chans.index(c) for c in ROI_CH]
 win = (times >= -0.4501) & (times <= -0.2966)
 R = lambda X: X[:, roi].mean(1) * 1e6  # (N, t) ROI waveform per participant
 AC, AT, RC, RT = R(a['control']), R(a['treatment']), R(r['control']), R(r['treatment'])
@@ -37,7 +39,7 @@ def deco(ax, title):
 
 fig, axs = plt.subplots(2, 2, figsize=(9, 6.6))
 ax = axs[0, 0]; band(ax, AC, COL_UNASSISTED, '-', 'Aha'); band(ax, RC, '0.45', (0, (4, 2)), 'Non-insight')
-deco(ax, 'Unassisted'); ax.set_ylabel('F3/C3/P3 amplitude ($\\mu$V)'); ax.legend(frameon=False, fontsize=8.5, loc='lower left')
+deco(ax, 'Unassisted'); ax.set_ylabel(('F3/C3/P3' if ROI_CH == ['F3', 'C3', 'P3'] else 'Cluster') + ' amplitude ($\\mu$V)'); ax.legend(frameon=False, fontsize=8.5, loc='lower left')
 ax = axs[0, 1]; band(ax, AT, COL_LLM, '-', 'Aha'); band(ax, RT, '0.45', (0, (4, 2)), 'Non-insight')
 deco(ax, 'LLM-assisted'); ax.legend(frameon=False, fontsize=8.5, loc='lower left')
 yl = (min(axs[0, 0].get_ylim()[0], axs[0, 1].get_ylim()[0]), max(axs[0, 0].get_ylim()[1], axs[0, 1].get_ylim()[1]))

@@ -17,6 +17,7 @@ Paths are in `config.py`. By default they follow your own `ERP/erp_shared.py` (`
 | `pca_roi_series.py` | PCA region signals for your Wallas notebook (Tak's request). Instructions are at the top of the file | Results: PCA robustness check |
 | `01_inventory.py`, `02_counts_time.py`, `02b_aha_rate.py`, `05_fig_behaviour.py` | Aha counts, aha rate per 10 min, time on task, and the 3-panel behavior figure | Fig. 1, behavior results |
 | `03_erp_cluster.py`, `04_fig_erp.py` | Participant-level ERPs, cluster test and the ERP figure | Fig. 2 |
+| `v8_erp_spatial.py`, `v8_fig_erp_neighbours.py` | ERP cluster test with spatial neighbours (Delaunay) and the search before the aha, cluster summary, leave-one-out, no-neighbour and notch checks, and the neighbour figure | ERP results, Fig 2 channels, appendix B |
 | `v7_1_erp_cluster_heldout.py` | The same cluster test (no notch, `NOTCH=1` for the v7 version), plus the leave-one-participant-out window check (13 of 15) | ERP results, v7 |
 | `07_noninsight_control.py`, `08_fig_noninsight.py`, `11_noninsight_cd_lattice19.py` | Random non-insight moments, count-matched, 1,000 draws | Fig. 3, non-insight control |
 | `28_erp_no_cut_epochs.py` | ERP test without epochs that cross a removed-data cut | Robustness check |
@@ -30,6 +31,8 @@ Paths are in `config.py`. By default they follow your own `ERP/erp_shared.py` (`
 `common.py` and `config.py` are helpers. `reference/13_athena_tfr_run.log` is the output of your time-frequency script, which `24` compares against. `reference/v7_table2_ddtf_wallas.json` holds the Table 2 and PCA numbers, so a rerun can be checked against it.
 
 ## Update (Nov 5): Table 2 from your cells, with beta and order 10
+
+Also the ERP cluster test now uses spatial neighbours and the search before the aha (see `CHANGES_v7_to_v8.md`, item 4). `07`, `04` and `08` take the cluster channels from `ROI_CH`.
 
 Table 2 now comes from your own connectivity cells (`v8_her_ddtf.py`), all 19 people, at 100 Hz with no notch. Beta (13-30 Hz) is added, so 18 tests in one FDR family, and the model order is 10 (Richard: three bands need more poles; residuals are also closer to white). AIC still picks 5 and BIC 2, and order 5 gives the same 8 pathways. Numbers and how to run each check are in `CHANGES_v7_to_v8.md`, reference outputs in `reference/table2_v8/`.
 
