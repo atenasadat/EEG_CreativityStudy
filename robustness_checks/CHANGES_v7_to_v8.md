@@ -14,7 +14,7 @@ Connectivity (Table 2 and the text around it) changed in three ways, and the ERP
 | Frontal-origin pathways | FDR >= .81 | FDR >= .24 (6 tests) | same |
 | Same at AIC order 5 | - | Same 8 pathways, FDR .003 to .026 | `ORDER=aic` |
 | Stage-wise Wilcoxon (32 tests) | not reported | None below .05 after FDR (smallest .11) | cell 31 |
-| PCA check | Ours: occipital to parietal, alpha and theta, FDR .015 | Athena's: all 6 parietal <-> occipital pathways, -26 to -34%, FDR <= .006. Frontal PCA is eye-dominated, so frontal pathways are reported from averages only | `ROI=pca` |
+| PCA check | Ours: occipital to parietal, alpha and theta, FDR .015 | Athena's: all 6 parietal <-> occipital pathways, -26 to -34%, FDR <= .006. Frontal PCA follows the electrodes nearest the eyes (Fp1 + Fp2 carry more than half the weight in 8 of 19, a single F7 or F8 in 5 more, `v8_pca_frontal_weights.py`), so frontal pathways are reported from averages only | `ROI=pca` |
 | Notch check | - | With the v7 notch (`NOTCH=1`) the same 8 pathways, every chi2 within 0.01 | `NOTCH=1` |
 | Laplacian check (reference-free, extra, not in the paper) | - | 6 of 18, all lower with the LLM: occipital to frontal theta and alpha (-27%), parietal to frontal theta and alpha (-26 to -28%), frontal to parietal alpha and beta (-21 to -22%), FDR .003 to .009. Parietal <-> occipital no longer differs (FDR >= .35) | `CSD=1` (`csd_patch.py`) |
 | Unstable windows | 54 of 12,648 | 61 of 13,881 | same |
@@ -35,6 +35,7 @@ export EEG_DATA=/path/to/cleaned CODING_CSV=/path/to/creativitycodings.csv
 OUT=out/main ORDER=10 FIG=1 python v8_her_ddtf.py      # Table 2, Fig 7
 OUT=out/aic ORDER=aic python v8_her_ddtf.py            # order 5 check
 OUT=out/pca ORDER=10 ROI=pca python v8_her_ddtf.py     # PCA check
+OUT=out/pca python v8_pca_frontal_weights.py           # which electrodes carry each PCA region signal
 OUT=out/notch OUT_DIR=<folder with meeting_1013/22a_line_noise_per_file.csv> NOTCH=1 python v8_her_ddtf.py
 python v8_ddtf_schematic.py out/main/tests.csv fig_ddtf_wallas_schematic.png   # Fig 8
 
