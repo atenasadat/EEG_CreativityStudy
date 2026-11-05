@@ -2,12 +2,15 @@
 
 Rewrite of Athena's wallas_analysis/wallas_mapping.ipynb dDTF part (not on GitHub). Uses her unchanged functions
 from Whole Session/wholesession_ddtf.py (commit 8c85cba) for loading, rest-offset correction, 4-s windows that do
-not span removed data, resampling to 128 Hz, detrend/z-score, MVAR least squares, stability check and dDTF.
+not span removed data, resampling to 100 Hz, detrend/z-score, MVAR least squares, stability check and dDTF.
+No notch and no band-pass on the data that go into the model. resample_poly has its own anti-aliasing low-pass
+at the new Nyquist (50 Hz), which also removes 60 Hz line noise. FS_NEW=128 gives the v7 rate as a check.
 
 Region signal (--roi):
   mean : average of the region's channels (paper)
   pca  : first principal component of the region's channels, fitted once per participant on all task data of
-         BOTH conditions (1-45 Hz band-passed copy for the fit), unit-norm weights; same filter for both conditions.
+         BOTH conditions (1-45 Hz band-passed copy for the fit only), unit-norm weights; the weights are then
+         applied to the unfiltered data, the same weights for both conditions.
 Segment label (--segments):
   wallas  : Wallas stage of the coding segment that contains the window centre (needs creativitycodings.csv,
             --coding PATH). Video clock -> EEG clock offset per session = median(EEG aha time on the original,
@@ -47,7 +50,7 @@ AHA_JSON = AHA_JSON
 STAGES = ['Preparation', 'Idea generation', 'Implementation', 'Verification']
 # Readme section 11: file task label -> coding-sheet task label
 TASK_FIX = {('P12', 'control', 'B1'): 'B2', ('P23', 'control', 'B3'): 'B2', ('P17', 'control', 'A2'): 'B2'}
-FS_NEW = 128.0
+FS_NEW = float(os.environ.get('FS_NEW', '100'))   # v7 used 128
 
 
 def parse_file(fname):
@@ -217,6 +220,11 @@ def run(args):
         json.dump(wrows, open(os.path.join(args.out, 'pca_weights.json'), 'w'), indent=1)
     if clock_rows:
         pd.DataFrame(clock_rows).to_csv(os.path.join(args.out, 'clock_offsets.csv'), index=False)
+    if args.segments == 'wallas':
+        # some people lack one condition in the coded stages, so the quick stats below do not apply;
+        # the Table 2 statistics come from v7_5_ddtf_wallas_stats.py, which reads windows.csv.gz
+        print('windows written; run v7_5_ddtf_wallas_stats.py for the Wallas-stage statistics', flush=True)
+        return
     stats(win_df, args.out)
 
 

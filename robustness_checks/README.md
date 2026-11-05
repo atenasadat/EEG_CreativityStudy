@@ -13,19 +13,27 @@ Paths are in `config.py`. By default they follow your own `ERP/erp_shared.py` (`
 | Script | What it does | In the paper |
 |---|---|---|
 | `22a_line_noise_per_file.py` | 60 Hz line-noise ratio for every cleaned recording (60 Hz power vs 55-58 and 62-65 Hz, median over the 19 channels) | Methods: line-noise screening. 6 recordings are above 2.0 |
-| `notch_patch.py` | Import it first, and any script that reads EEG gets a 60 Hz notch on those 6 recordings | Methods: selective notch |
+| `notch_patch.py` | Import it first, and any script that reads EEG gets a 60 Hz notch on those 6 recordings. Not used by default any more: set `NOTCH=1` to run a script with it | Check only (v7 used it) |
 | `pca_roi_series.py` | PCA region signals for your Wallas notebook (Tak's request). Instructions are at the top of the file | Results: PCA robustness check |
 | `01_inventory.py`, `02_counts_time.py`, `02b_aha_rate.py`, `05_fig_behaviour.py` | Aha counts, aha rate per 10 min, time on task, and the 3-panel behavior figure | Fig. 1, behavior results |
 | `03_erp_cluster.py`, `04_fig_erp.py` | Participant-level ERPs, cluster test and the ERP figure | Fig. 2 |
-| `v7_1_erp_cluster_heldout.py` | The same cluster test with the notch, plus the leave-one-participant-out window check (13 of 15) | ERP results, v7 |
+| `v7_1_erp_cluster_heldout.py` | The same cluster test (no notch, `NOTCH=1` for the v7 version), plus the leave-one-participant-out window check (13 of 15) | ERP results, v7 |
 | `07_noninsight_control.py`, `08_fig_noninsight.py`, `11_noninsight_cd_lattice19.py` | Random non-insight moments, count-matched, 1,000 draws | Fig. 3, non-insight control |
 | `28_erp_no_cut_epochs.py` | ERP test without epochs that cross a removed-data cut | Robustness check |
 | `v7_erp_perchannel_figs.py` | ERP at F3, C3 and P3 plotted separately, and each person's window value | Answer to Richard |
 | `24_tfr_after_aha_per_person.py` | Runs your `erp_tfr_tf_cluster_pre_event.py` unchanged and gives each person's values | After-aha power, per person |
-| `23_ddtf_stagewise.py`, `v7_ddtf_wrapper.py`, `v7_4_ddtf_runs.py`, `v7_5_ddtf_wallas_stats.py` | Wallas-stage dDTF with the notch, channel average and PCA, and the mixed-model test. This is the exact code behind v7 Table 2 and the PCA numbers. It follows your `wallas_mapping.ipynb` and `Whole Session/wholesession_ddtf.py` | Table 2 (8 of 12, N = 14), PCA check |
+| `23_ddtf_stagewise.py`, `v7_ddtf_wrapper.py`, `v7_4_ddtf_runs.py`, `v7_5_ddtf_wallas_stats.py` | Wallas-stage dDTF, channel average and PCA, and the mixed-model test. Now no notch and 100 Hz (see below). `NOTCH=1 FS_NEW=128` gives the v7 Table 2 and PCA numbers. It follows your `wallas_mapping.ipynb` and `Whole Session/wholesession_ddtf.py` | Table 2 (8 of 12, N = 14), PCA check |
 | `v7_ddtf_schematic.py` | The three-region schematic of Table 2 | dDTF schematic figure |
 
 `common.py` and `config.py` are helpers. `reference/13_athena_tfr_run.log` is the output of your time-frequency script, which `24` compares against. `reference/v7_table2_ddtf_wallas.json` holds the Table 2 and PCA numbers, so a rerun can be checked against it.
+
+## Update (Nov 4): no notch, 100 Hz
+
+Connectivity and ERP no longer use the 60 Hz notch. Before the MVAR fit, each 4-s window is only resampled from 300 to 100 Hz (`scipy.signal.resample_poly`). Its anti-aliasing low-pass at the new Nyquist (50 Hz) also removes the 60 Hz line noise, so no separate filter is needed. There is no band-pass on the data that go into the model. The only band-pass left is a 1-45 Hz copy used to fit the PCA weights in the PCA check, and the weights are then applied to the unfiltered data.
+
+v7 Table 2 used the notch on 6 files and 128 Hz. To get those numbers back, run with `NOTCH=1 FS_NEW=128`. New reference numbers are in `reference/table2_ddtf_wallas_100hz_nonotch.json`, and what changed is in `CHANGES_v7_to_v8.md`.
+
+New optional setting: `EEG_BASELINES` sets the folder with the rest recordings for the dDTF scripts (default: `BASE_PATH_ICA` in `ERP/erp_shared.py`).
 
 ## Run order
 
@@ -41,4 +49,4 @@ python v7_4_ddtf_runs.py && python v7_5_ddtf_wallas_stats.py && python v7_ddtf_s
 
 ## Note on filtering
 
-MNE gives EEGLAB boundary events a duration equal to the removed length. If a filter is told to skip boundaries, it then skips real data after each cut. `notch_patch.py` sets those durations to 0 before filtering, so all data is filtered.
+MNE gives EEGLAB boundary events a duration equal to the removed length. If a filter is told to skip boundaries, it then skips real data after each cut. `notch_patch.py` sets those durations to 0 before filtering, so all data is filtered. This only matters with `NOTCH=1`.
