@@ -12,6 +12,8 @@ stage-wise Wilcoxon tests, cell 32 for the brain figure), run without changing t
     participant on a 1-45 Hz band-passed copy of all task data of both conditions, then applied to the
     unfiltered data (the band-passed copy is used only for the fit).
   - NOTCH=1 (check only) puts the v7 60 Hz notch on the six noisy recordings.
+  - CSD=1 (check only) replaces the average reference with a surface Laplacian (csd_patch.py), which is
+    reference-free (Kaminski et al. 2001 warn against the average reference for DTF).
   - FIG=1 draws cell 32's figures with beta rows added, into OUT/figures (nothing is written to the repo).
 
 Usage:
@@ -30,6 +32,9 @@ ROI, FIG = os.environ.get('ROI', 'mean'), os.environ.get('FIG', '0') == '1'
 if os.environ.get('NOTCH') == '1':  # check only: 60 Hz notch on the six noisy recordings, as in v7
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     import notch_patch  # noqa: F401
+if os.environ.get('CSD') == '1':  # check only: surface Laplacian (reference-free) at read time
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import csd_patch  # noqa: F401
 
 nb = json.load(open(REPO / 'wallas_analysis' / 'wallas_mapping.ipynb'))
 src = lambda i: ''.join(nb['cells'][i]['source'])

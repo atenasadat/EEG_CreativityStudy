@@ -16,6 +16,7 @@ Connectivity (Table 2 and the text around it) changed in three ways, and the ERP
 | Stage-wise Wilcoxon (32 tests) | not reported | None below .05 after FDR (smallest .11) | cell 31 |
 | PCA check | Ours: occipital to parietal, alpha and theta, FDR .015 | Athena's: all 6 parietal <-> occipital pathways, -26 to -34%, FDR <= .006. Frontal PCA is eye-dominated, so frontal pathways are reported from averages only | `ROI=pca` |
 | Notch check | - | With the v7 notch (`NOTCH=1`) the same 8 pathways, every chi2 within 0.01 | `NOTCH=1` |
+| Laplacian check (reference-free) | - | 6 of 18, all lower with the LLM: occipital to frontal theta and alpha (-27%), parietal to frontal theta and alpha (-26 to -28%), frontal to parietal alpha and beta (-21 to -22%), FDR .003 to .009. Parietal <-> occipital no longer differs (FDR >= .35) | `CSD=1` (`csd_patch.py`) |
 | Unstable windows | 54 of 12,648 | 61 of 13,881 | same |
 | Model order | AIC 5 (39 ms), BIC 3, N = 512 | Used 10 (100 ms). AIC 5, BIC 2, N = 400 | same |
 | Fig 7 (brain networks) | v06 figure (theta, alpha) | Redrawn by her cell 32, theta, alpha and beta rows | `FIG=1` |
@@ -25,6 +26,7 @@ Connectivity (Table 2 and the text around it) changed in three ways, and the ERP
 | ERP leave-one-out | 13 of 15, p = .0004 | 10 of 15, Wilcoxon p = .010 (same spatial test on each 14) | same |
 | Non-insight control | F3 C3 P3: W = 47, p = .49, 4.0% of draws, clusters .16 / .29 | 8 cluster channels: W = 54, p = .76, 4.4% of draws, no draw as large as the aha difference, clusters .21 / .16 | `07_noninsight_control.py` with `ROI_CH` |
 | After-aha power | FDR .030 | FDR .030 (the notch never touched it) | your `erp_tfr_tf_cluster_pre_event.py` |
+| Pre-aha power (new) | - | Aha vs 40 random moments per recording, Morlet as yours: theta higher before the aha in both conditions, frontal, central, parietal, occipital, FDR .005 to .016, frontal 1-7 Hz cluster -1.18 to -0.58 s, p = .003. No LLM difference (FDR >= .38). Not significant against each epoch's own -5 to -4 s | `v8_pre_aha_power.py`, `v8_pre_aha_power_stats.py`, `v8_fig_pre_aha_power.py` |
 
 Run (paths are examples):
 
@@ -41,6 +43,9 @@ OUT_DIR=out/erp python v8_erp_spatial.py                      # ERP test, summar
 export ROI_CH=P3,C3,F3,C4,Cz,T7,P7,Pz
 OUT_DIR=out/erp python 07_noninsight_control.py && OUT_DIR=out/erp python 04_fig_erp.py && OUT_DIR=out/erp python 08_fig_noninsight.py
 OUT_DIR=out/erp python v8_fig_erp_neighbours.py                # appendix figure
+OUT=out/csd ORDER=10 CSD=1 python v8_her_ddtf.py               # Laplacian check
+OUT=out/pre python v8_pre_aha_power.py && MAPS=out/pre/maps_v2.npz python v8_pre_aha_power_stats.py
+MAPS=out/pre/maps_v2.npz FIG=fig_pre_aha_power python v8_fig_pre_aha_power.py
 ```
 
 Each run writes tests.csv (the 18 tests), unit.csv, coverage.csv, order_selection.csv (mean AIC and BIC for orders 1-20), posthoc.csv (stage-wise Wilcoxon) and summary.json. Reference numbers: `reference/table2_v8/`.
