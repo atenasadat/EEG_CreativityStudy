@@ -20,19 +20,21 @@ times = a['times']; chans = list(a['chans'])
 ROI_CH = os.environ.get('ROI_CH', 'F3,C3,P3').split(',')   # v08: the spatial cluster
 roi = [chans.index(c) for c in ROI_CH]
 win = (times >= -0.4501) & (times <= -0.2966)
+TMAX = float(os.environ.get('TMAX', '0.5'))   # v08 paper: TMAX=0 (only the time before the aha is shown)
+tp = times <= TMAX + 1e-9
 R = lambda X: X[:, roi].mean(1) * 1e6  # (N, t) ROI waveform per participant
 AC, AT, RC, RT = R(a['control']), R(a['treatment']), R(r['control']), R(r['treatment'])
 N = AC.shape[0]
 
 def band(ax, Y, col, ls, lab):
-    m = Y.mean(0); se = Y.std(0, ddof=1) / np.sqrt(N)
-    ax.fill_between(times, m - se, m + se, color=col, alpha=0.18, lw=0)
-    ax.plot(times, m, color=col, ls=ls, lw=1.5, label=lab)
+    m = Y.mean(0)[tp]; se = Y.std(0, ddof=1)[tp] / np.sqrt(N)
+    ax.fill_between(times[tp], m - se, m + se, color=col, alpha=0.18, lw=0)
+    ax.plot(times[tp], m, color=col, ls=ls, lw=1.5, label=lab)
 
 def deco(ax, title):
     ax.axvspan(times[win][0], times[win][-1], color='0.87', lw=0, zorder=0)
     ax.axhline(0, color='0.3', lw=0.6); ax.axvline(0, color='k', ls='--', lw=0.9)
-    ax.set_xlim(-0.5, 0.5); ax.set_title(title, fontsize=11)
+    ax.set_xlim(-0.5, TMAX); ax.set_title(title, fontsize=11)
     ax.set_xlabel('Time relative to event (s)')
     for s in ['top', 'right']:
         ax.spines[s].set_visible(False)

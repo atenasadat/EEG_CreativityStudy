@@ -5,7 +5,7 @@ Connectivity (Table 2 and the text around it) changed in three ways, and the ERP
 1. **No notch, 100 Hz.** v7 put a 60 Hz notch on 6 recordings (all four P20 files, P11 control A2, P13 control B3) and resampled the connectivity windows to 128 Hz. v8 drops the notch everywhere. Each 4-s window is only resampled from 300 to 100 Hz. The anti-aliasing low-pass in `resample_poly` (cutoff at the new 50 Hz Nyquist) removes the 60 Hz line noise, so no separate filter is needed. No band-pass is applied to the data that go into the MVAR model.
 2. **Athena's analysis is the main one again.** Table 2 now comes from her notebook cells (`wallas_analysis/wallas_mapping.ipynb`, cells 2-17, 30, 31, 32), run by `v8_her_ddtf.py` without changing the notebook: her stage alignment, all 19 people. v7 used our stage-aligned version (`23_ddtf_stagewise.py`, 14 people). Our extra two pathways (parietal to frontal) did not hold in her analysis or with session quarters, so the 19-person version is the safer claim.
 3. **Beta and model order 10** (Richard's ask). Beta (13-30 Hz) is added next to theta and alpha, so 18 tests in one FDR family. The model order is 10 instead of the AIC order 5: three bands need more poles, and the residuals are closer to white (portmanteau test fails in 31% of windows at order 5, 15% at order 10). AIC (5) and BIC (2) are still computed and printed, and order 5 is reported as a check.
-4. **ERP neighbours.** The cluster test used MNE's default `adjacency=None`, which links channels that are next to each other in the data array (Cz-Fp1, O2-F7), not on the head. v8 uses spatial neighbours (Delaunay triangulation of the electrode positions, as in Maris & Oostenveld 2007 and Sassenhagen & Draschkow 2019) and searches -0.5 to 0 s, since the question is about the time before the aha. That window was chosen after the -0.5 to 0.5 s search gave .080, and the paper says so. The cluster now has 8 channels, so the cluster summary, leave-one-out check, non-insight control and Figs 2 and 3 use those 8 (`ROI_CH=P3,C3,F3,C4,Cz,T7,P7,Pz`). Neighbour figure for the appendix: `v8_fig_erp_neighbours.py`.
+4. **ERP neighbours.** The cluster test used MNE's default `adjacency=None`, which links channels that are next to each other in the data array (Cz-Fp1, O2-F7), not on the head. v8 uses spatial neighbours (Delaunay triangulation of the electrode positions, as in Maris & Oostenveld 2007 and Sassenhagen & Draschkow 2019) and searches -0.5 to 0 s, since the question is about the time before the aha. That window was chosen after the -0.5 to 0.5 s search gave .080 (that number is not in the paper). Figs 2 and 3 now show only -0.5 to 0 s (`TMAX=0`). The cluster now has 8 channels, so the cluster summary, leave-one-out check, non-insight control and Figs 2 and 3 use those 8 (`ROI_CH=P3,C3,F3,C4,Cz,T7,P7,Pz`). Neighbour figure for the appendix: `v8_fig_erp_neighbours.py`.
 
 | Part of the paper | v7 | v8 | Script |
 |---|---|---|---|
@@ -13,20 +13,22 @@ Connectivity (Table 2 and the text around it) changed in three ways, and the ERP
 | Which pathways | All 8 from parietal or occipital, incl. parietal to frontal | Parietal to occipital and occipital to parietal in all three bands, occipital to frontal in theta and alpha. Parietal to frontal FDR >= .53, beta occipital to frontal .13 | same |
 | Frontal-origin pathways | FDR >= .81 | FDR >= .24 (6 tests) | same |
 | Same at AIC order 5 | - | Same 8 pathways, FDR .003 to .026 | `ORDER=aic` |
-| Stage-wise Wilcoxon (32 tests) | not reported | None below .05 after FDR (smallest .11) | cell 31 |
+| Stage-wise Wilcoxon (32 tests, not in the paper) | not reported | None below .05 after FDR (smallest .11) | cell 31 |
 | PCA check | Ours: occipital to parietal, alpha and theta, FDR .015 | Athena's: all 6 parietal <-> occipital pathways, -26 to -34%, FDR <= .006. Frontal PCA follows the electrodes nearest the eyes (Fp1 + Fp2 carry more than half the weight in 8 of 19, a single F7 or F8 in 5 more, `v8_pca_frontal_weights.py`), so frontal pathways are reported from averages only | `ROI=pca` |
-| Notch check | - | With the v7 notch (`NOTCH=1`) the same 8 pathways, every chi2 within 0.01 | `NOTCH=1` |
+| Notch check (not in the paper) | - | With the v7 notch (`NOTCH=1`) the same 8 pathways, every chi2 within 0.01 | `NOTCH=1` |
 | Laplacian check (reference-free, extra, not in the paper) | - | 6 of 18, all lower with the LLM: occipital to frontal theta and alpha (-27%), parietal to frontal theta and alpha (-26 to -28%), frontal to parietal alpha and beta (-21 to -22%), FDR .003 to .009. Parietal <-> occipital no longer differs (FDR >= .35) | `CSD=1` (`csd_patch.py`) |
 | Unstable windows | 54 of 12,648 | 61 of 13,881 | same |
 | Model order | AIC 5 (39 ms), BIC 3, N = 512 | Used 10 (100 ms). AIC 5, BIC 2, N = 400 | same |
 | Fig 7 (brain networks) | v06 figure (theta, alpha) | Redrawn by her cell 32, theta, alpha and beta rows | `FIG=1` |
 | Fig 8 (schematic) | 2 bands | 3 bands | `v8_ddtf_schematic.py` |
-| ERP cluster neighbours | Channels next to each other in the data file (MNE `adjacency=None`), search -0.5 to 0.5 s: F3 C3 P3, p = .039 (notch) / .037 | Spatial neighbours (Delaunay triangulation, `find_ch_adjacency`), search -0.5 to 0 s: F3 T7 C3 Cz C4 P7 P3 Pz, -450 to -297 ms, p = .029 (.080 over -0.5 to 0.5 s, reported). No neighbours: F3 only, p = .032. Notch: .030 | `v8_erp_spatial.py` |
+| ERP cluster neighbours | Channels next to each other in the data file (MNE `adjacency=None`), search -0.5 to 0.5 s: F3 C3 P3, p = .039 (notch) / .037 | Spatial neighbours (Delaunay triangulation, `find_ch_adjacency`), search -0.5 to 0 s: F3 T7 C3 Cz C4 P7 P3 Pz, -450 to -297 ms, p = .029 (.080 over -0.5 to 0.5 s, not in the paper). No neighbours: F3 only, p = .032. Notch: .030 | `v8_erp_spatial.py` |
 | ERP cluster summary | F3 C3 P3: 13 of 15, Wilcoxon p = .0004, dz = -0.70 | 8 cluster channels: +2.72 vs -2.56 uV, 13 of 15, Wilcoxon p = .0006, dz = -0.70 | same |
 | ERP leave-one-out | 13 of 15, p = .0004 | 10 of 15, Wilcoxon p = .010 (same spatial test on each 14) | same |
 | Non-insight control | F3 C3 P3: W = 47, p = .49, 4.0% of draws, clusters .16 / .29 | 8 cluster channels: W = 54, p = .76, 4.4% of draws, no draw as large as the aha difference, clusters .21 / .16 | `07_noninsight_control.py` with `ROI_CH` |
 | After-aha power | FDR .030 | FDR .030 (the notch never touched it) | your `erp_tfr_tf_cluster_pre_event.py` |
-| Pre-aha power (new) | - | Aha vs 40 random moments per recording, Morlet as yours: theta higher before the aha in both conditions, frontal, central, parietal, occipital, FDR .005 to .016, frontal 1-7 Hz cluster -1.18 to -0.58 s, p = .003. No LLM difference (FDR >= .38). Not significant against each epoch's own -5 to -4 s | `v8_pre_aha_power.py`, `v8_pre_aha_power_stats.py`, `v8_fig_pre_aha_power.py` |
+| Pre-aha power (new, Appendix C) | - | Aha vs 40 random moments per recording, Morlet as yours: theta higher before the aha in both conditions, frontal, central, parietal, occipital, FDR .005 to .016, frontal 1-7 Hz cluster -1.18 to -0.58 s, p = .003. No LLM difference (FDR >= .38). Not significant against each epoch's own -5 to -4 s | `v8_pre_aha_power.py`, `v8_pre_aha_power_stats.py`, `v8_fig_pre_aha_power.py` |
+
+Not in the paper, kept here as checks: the Laplacian, the notch runs, the -0.5 to 0.5 s ERP search, the stage-wise Wilcoxon tests, the residual whiteness numbers, and the pre-aha power against each epoch's own -5 to -4 s.
 
 Run (paths are examples):
 
@@ -42,7 +44,7 @@ python v8_ddtf_schematic.py out/main/tests.csv fig_ddtf_wallas_schematic.png   #
 OUT_DIR=out/erp python 03_erp_cluster.py                      # participant ERPs (no notch)
 OUT_DIR=out/erp python v8_erp_spatial.py                      # ERP test, summary, leave-one-out, checks
 export ROI_CH=P3,C3,F3,C4,Cz,T7,P7,Pz
-OUT_DIR=out/erp python 07_noninsight_control.py && OUT_DIR=out/erp python 04_fig_erp.py && OUT_DIR=out/erp python 08_fig_noninsight.py
+OUT_DIR=out/erp python 07_noninsight_control.py && OUT_DIR=out/erp TMAX=0 python 04_fig_erp.py && OUT_DIR=out/erp TMAX=0 python 08_fig_noninsight.py
 OUT_DIR=out/erp python v8_fig_erp_neighbours.py                # appendix figure
 OUT=out/csd ORDER=10 CSD=1 python v8_her_ddtf.py               # Laplacian check (not in the paper)
 OUT=out/pre python v8_pre_aha_power.py && MAPS=out/pre/maps_v2.npz python v8_pre_aha_power_stats.py

@@ -23,6 +23,8 @@ z = np.load(f'{OUT}/03_participant_erps.npz')
 C, T, times, chans, pids = z['control'] * 1e6, z['treatment'] * 1e6, z['times'], list(z['chans']), list(z['pids'])
 N = C.shape[0]
 win = (times >= -0.4501) & (times <= -0.2966)
+TMAX = float(os.environ.get('TMAX', '0.5'))   # v08 paper: TMAX=0 (only the time before the aha is shown)
+tp = times <= TMAX + 1e-9
 scalp = [chans.index(c) for c in SCALP_CHANS]
 
 # montage/positions from one recording (EEGLAB Standard-10-20-Cap25 locations stored in the .set)
@@ -70,12 +72,12 @@ for k, ch in enumerate(['F3', 'C3', 'P3']):
     ax.axvline(0, color='k', ls='--', lw=0.9, zorder=1)
     for X, col, lab in [(C, COL_UNASSISTED, 'Unassisted'), (T, COL_LLM, 'LLM-assisted')]:
         m = X[:, i].mean(0); se = X[:, i].std(0, ddof=1) / np.sqrt(N)
-        ax.fill_between(times, m - se, m + se, color=col, alpha=0.18, lw=0, zorder=2)
-        ax.plot(times, m, color=col, lw=1.5, zorder=3)
-        ylo, yhi = min(ylo, (m - se).min()), max(yhi, (m + se).max())
+        ax.fill_between(times[tp], (m - se)[tp], (m + se)[tp], color=col, alpha=0.18, lw=0, zorder=2)
+        ax.plot(times[tp], m[tp], color=col, lw=1.5, zorder=3)
+        ylo, yhi = min(ylo, (m - se)[tp].min()), max(yhi, (m + se)[tp].max())
         vals[f'{ch}_{lab}_window_mean_uV'] = float(X[:, i][:, win].mean())
     ax.set_title(ch, fontsize=12, fontweight='bold')
-    ax.set_xlim(-0.5, 0.5)
+    ax.set_xlim(-0.5, TMAX)
     ax.set_xlabel('Time relative to insight (s)')
     if k == 0:
         ax.set_ylabel('Amplitude ($\\mu$V)')
