@@ -57,26 +57,47 @@ ax.text(0.02, 0.97, f'cluster {f[fi.min()]:.0f}-{f[fi.max()]:.0f} Hz, {t[tm][ti.
         f'p = ' + f'{pv[k]:.3f}'.lstrip('0'), transform=ax.transAxes, va='top', fontsize=8.5,
         bbox=dict(fc='white', ec='none', alpha=0.85, pad=1.5))
 
-# B: theta per region
+# B: theta per region. POOLED=1 (paper v08): mean of the two conditions, the contrast that was tested, with stars
+# from the paper's FDR family (STATS = pre_aha_power_stats.json, 15 region x band tests). POOLED=0: per condition.
+POOLED = os.environ.get('POOLED', '1') == '1'
 ax = fig.add_subplot(gs[0, 1])
 fm = (f >= 4) & (f <= 8)
 rows, ps = [], []
 for roi in ROIS:
     d = {c: np.array([diff(p, c, roi)[fm][:, tm].mean() for p in pids]) for c in COL}
     rows.append(d); ps.append(st.wilcoxon((d['control'] + d['treatment']) / 2).pvalue)
-qs = bh(ps)  # within theta only, for the stars; the paper's family is 15 tests (5 regions x 3 bands)
+qs = bh(ps)  # within theta only, used when STATS is not given
+if os.environ.get('STATS'):
+    import json
+    R = {r['roi']: r['q_pooled'] for r in json.load(open(os.environ['STATS']))['v08']['session']['-2..0']
+         if r['band'] == 'Theta'}
+    qs = [R[roi] for roi in ROIS]
 for i, (roi, d) in enumerate(zip(ROIS, rows)):
+    if POOLED:
+        y = (d['control'] + d['treatment']) / 2
+        ax.scatter(np.full(N, i) + np.random.default_rng(i).uniform(-0.08, 0.08, N), y, s=11, color='0.55', alpha=0.5,
+                   lw=0)
+        m, se = y.mean(), y.std(ddof=1) / np.sqrt(N)
+        ax.errorbar(i, m, yerr=se, fmt='o', color='0.15', ms=7, capsize=3.5, lw=1.5)
+        continue
     for j, c in enumerate(COL):
         x = i + (j - 0.5) * 0.32
         ax.scatter(np.full(N, x) + np.random.default_rng(i * 2 + j).uniform(-0.05, 0.05, N), d[c], s=9, color=COL[c],
                    alpha=0.35, lw=0)
         m, se = d[c].mean(), d[c].std(ddof=1) / np.sqrt(N)
         ax.errorbar(x, m, yerr=se, fmt='o', color=COL[c], ms=6, capsize=3, lw=1.4, label=LAB[c] if i == 0 else None)
+if POOLED:  # stars at one height above all dots: FDR-adjusted p < .05 (*), < .01 (**)
+    top = max(((d['control'] + d['treatment']) / 2).max() for d in rows)
+    for i in range(len(ROIS)):
+        ax.text(i, top + 0.1, '**' if qs[i] < .01 else '*' if qs[i] < .05 else '', ha='center', va='bottom',
+                fontsize=12)
+    ax.set_ylim(top=top + 0.45)
 ax.axhline(0, color='0.3', lw=0.7)
 ax.set_xticks(range(len(ROIS))); ax.set_xticklabels(list(ROIS))
 ax.set_ylabel('Theta, aha $-$ random (dB)')
 ax.set_title('Theta (4-8 Hz), $-2$ to 0 s before the insight', fontsize=10.5)
-ax.legend(frameon=False, fontsize=8.5, loc='lower left')
+if not POOLED:
+    ax.legend(frameon=False, fontsize=8.5, loc='lower left')
 for s in ['top', 'right']:
     ax.spines[s].set_visible(False)
 for x, lab in zip([fig.axes[0], ax], 'AB'):

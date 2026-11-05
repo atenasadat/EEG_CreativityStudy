@@ -48,7 +48,7 @@ OUT_DIR=out/erp python 07_noninsight_control.py && OUT_DIR=out/erp TMAX=0 python
 OUT_DIR=out/erp python v8_fig_erp_neighbours.py                # neighbour figure (not in the paper)
 OUT=out/csd ORDER=10 CSD=1 python v8_her_ddtf.py               # Laplacian check (not in the paper)
 OUT=out/pre python v8_pre_aha_power.py && MAPS=out/pre/maps_v2.npz python v8_pre_aha_power_stats.py
-MAPS=out/pre/maps_v2.npz FIG=fig_pre_aha_power python v8_fig_pre_aha_power.py
+MAPS=out/pre/maps_v2.npz STATS=out/pre/pre_aha_power_stats.json FIG=fig_pre_aha_power python v8_fig_pre_aha_power.py   # panel B pooled over conditions (POOLED=0 splits them)
 ```
 
 Each run writes tests.csv (the 18 tests), unit.csv, coverage.csv, order_selection.csv (mean AIC and BIC for orders 1-20), posthoc.csv (stage-wise Wilcoxon) and summary.json. Reference numbers: `reference/table2_v8/`.
