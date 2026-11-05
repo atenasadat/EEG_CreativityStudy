@@ -4,6 +4,7 @@ Input : outputs/03_participant_erps.npz (participant ERPs from 03_erp_cluster.py
 Output: Figures/v04/fig1_erp_cluster_participant_level.{png,pdf}; outputs/04_fig_erp_values.json
 """
 import json
+import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -22,6 +23,8 @@ z = np.load(f'{OUT}/03_participant_erps.npz')
 C, T, times, chans, pids = z['control'] * 1e6, z['treatment'] * 1e6, z['times'], list(z['chans']), list(z['pids'])
 N = C.shape[0]
 win = (times >= -0.4501) & (times <= -0.2966)
+TMAX = float(os.environ.get('TMAX', '0.5'))   # v08 paper: TMAX=0 (only the time before the aha is shown)
+tp = times <= TMAX + 1e-9
 scalp = [chans.index(c) for c in SCALP_CHANS]
 
 # montage/positions from one recording (EEGLAB Standard-10-20-Cap25 locations stored in the .set)
@@ -39,11 +42,12 @@ gtop = gs[0].subgridspec(1, 5, width_ratios=[1, 1, 1, 1, 0.06], wspace=0.15)
 gbot = gs[1].subgridspec(1, 3, wspace=0.22)
 titles = ['Unassisted', 'LLM-assisted', 'Difference\n(Unassisted $-$ LLM-assisted)', 'Difference\n(cluster channels)']
 data = [topo_u, topo_l, topo_d, topo_d]
-mask = np.array([c in ('F3', 'C3', 'P3') for c in SCALP_CHANS])
+ROI_CH = os.environ.get('ROI_CH', 'F3,C3,P3').split(',')   # v08: the 8 channels of the spatial cluster
+mask = np.array([c in ROI_CH for c in SCALP_CHANS])
 for k in range(4):
     ax = fig.add_subplot(gtop[0, k])
     kw = dict(mask=mask, mask_params=dict(marker='o', markerfacecolor='white', markeredgecolor='k',
-                                          linewidth=0.8, markersize=15)) if k == 3 else {}
+                                          markeredgewidth=0.8, linestyle='none', markersize=15)) if k == 3 else {}
     im, _ = mne.viz.plot_topomap(data[k], info, axes=ax, show=False, cmap='RdBu_r', vlim=(-vmax, vmax),
                                  contours=6, sensors=True, names=SCALP_CHANS if k == 3 else None, **kw)
     if k == 3:
@@ -68,12 +72,12 @@ for k, ch in enumerate(['F3', 'C3', 'P3']):
     ax.axvline(0, color='k', ls='--', lw=0.9, zorder=1)
     for X, col, lab in [(C, COL_UNASSISTED, 'Unassisted'), (T, COL_LLM, 'LLM-assisted')]:
         m = X[:, i].mean(0); se = X[:, i].std(0, ddof=1) / np.sqrt(N)
-        ax.fill_between(times, m - se, m + se, color=col, alpha=0.18, lw=0, zorder=2)
-        ax.plot(times, m, color=col, lw=1.5, zorder=3)
-        ylo, yhi = min(ylo, (m - se).min()), max(yhi, (m + se).max())
+        ax.fill_between(times[tp], (m - se)[tp], (m + se)[tp], color=col, alpha=0.18, lw=0, zorder=2)
+        ax.plot(times[tp], m[tp], color=col, lw=1.5, zorder=3)
+        ylo, yhi = min(ylo, (m - se)[tp].min()), max(yhi, (m + se)[tp].max())
         vals[f'{ch}_{lab}_window_mean_uV'] = float(X[:, i][:, win].mean())
     ax.set_title(ch, fontsize=12, fontweight='bold')
-    ax.set_xlim(-0.5, 0.5)
+    ax.set_xlim(-0.5, TMAX)
     ax.set_xlabel('Time relative to insight (s)')
     if k == 0:
         ax.set_ylabel('Amplitude ($\\mu$V)')
@@ -93,7 +97,7 @@ for ext in ['png', 'pdf']:
 vals.update(dict(N=N, vlim_uV=vmax, topo_unassisted=dict(zip(SCALP_CHANS, map(float, topo_u))),
                  topo_llm=dict(zip(SCALP_CHANS, map(float, topo_l))),
                  topo_diff=dict(zip(SCALP_CHANS, map(float, topo_d))),
-                 roi_unassisted=float(C[:, [chans.index(c) for c in ('F3', 'C3', 'P3')]][:, :, win].mean()),
-                 roi_llm=float(T[:, [chans.index(c) for c in ('F3', 'C3', 'P3')]][:, :, win].mean())))
+                 roi_unassisted=float(C[:, [chans.index(c) for c in ROI_CH]][:, :, win].mean()),
+                 roi_llm=float(T[:, [chans.index(c) for c in ROI_CH]][:, :, win].mean())))
 json.dump(vals, open(f'{OUT}/04_fig_erp_values.json', 'w'), indent=1)
 print(json.dumps({k: v for k, v in vals.items() if not k.startswith('topo')}, indent=1))

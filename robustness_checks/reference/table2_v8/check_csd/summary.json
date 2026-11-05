@@ -1,0 +1,13 @@
+{
+ "fs": 100,
+ "order_used": 10,
+ "order_aic": 5,
+ "order_bic": 2,
+ "roi": "mean",
+ "n_subjects": 19,
+ "n_rows": 150,
+ "windows_used": 13818,
+ "windows_unstable": 63,
+ "n_tests": 18,
+ "n_fdr_below_05": 6
+}

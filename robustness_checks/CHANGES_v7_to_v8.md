@@ -1,26 +1,60 @@
-# What changed from v7 to v8: no notch, connectivity at 100 Hz
+# What changed from v7 to v8
 
-v7 put a 60 Hz notch on 6 recordings (all four P20 files, P11 control A2, P13 control B3) and resampled the connectivity windows to 128 Hz. v8 drops the notch everywhere. Each 4-s connectivity window is only resampled from 300 to 100 Hz. The anti-aliasing low-pass in `resample_poly` (cutoff at the new 50 Hz Nyquist) removes the 60 Hz line noise, so no separate filter is needed. No band-pass is applied to the data that go into the MVAR model.
+Connectivity (Table 2 and the text around it) changed in three ways, and the ERP cluster test in one (item 4):
 
-Same cleaned files, same windows, same Wallas coding, same model (order 5) and same statistics as v7.
+1. **No notch, 100 Hz.** v7 put a 60 Hz notch on 6 recordings (all four P20 files, P11 control A2, P13 control B3) and resampled the connectivity windows to 128 Hz. v8 drops the notch everywhere. Each 4-s window is only resampled from 300 to 100 Hz. The anti-aliasing low-pass in `resample_poly` (cutoff at the new 50 Hz Nyquist) removes the 60 Hz line noise, so no separate filter is needed. No band-pass is applied to the data that go into the MVAR model.
+2. **Athena's analysis is the main one again.** Table 2 now comes from her notebook cells (`wallas_analysis/wallas_mapping.ipynb`, cells 2-17, 30, 31, 32), run by `v8_her_ddtf.py` without changing the notebook: her stage alignment, all 19 people. v7 used our stage-aligned version (`23_ddtf_stagewise.py`, 14 people). Our extra two pathways (parietal to frontal) did not hold in her analysis or with session quarters, so the 19-person version is the safer claim.
+3. **Beta and model order 10** (Richard's ask). Beta (13-30 Hz) is added next to theta and alpha, so 18 tests in one FDR family. The model order is 10 instead of the AIC order 5: three bands need more poles, and the residuals are closer to white (portmanteau test fails in 31% of windows at order 5, 15% at order 10). AIC (5) and BIC (2) are still computed and printed, and order 5 is reported as a check.
+4. **ERP neighbours.** The cluster test used MNE's default `adjacency=None`, which links channels that are next to each other in the data array (Cz-Fp1, O2-F7), not on the head. v8 uses spatial neighbours (Delaunay triangulation of the electrode positions, as in Maris & Oostenveld 2007 and Sassenhagen & Draschkow 2019) and searches -0.5 to 0 s, since the question is about the time before the aha. That window was chosen after the -0.5 to 0.5 s search gave .080 (that number is not in the paper). Figs 2 and 3 now show only -0.5 to 0 s (`TMAX=0`). The cluster now has 8 channels, so the cluster summary, leave-one-out check, non-insight control and Figs 2 and 3 use those 8 (`ROI_CH=P3,C3,F3,C4,Cz,T7,P7,Pz`). Neighbour figure (not in the paper, the Methods cite the neighbour definition instead): `v8_fig_erp_neighbours.py`.
 
-| Part of the paper | v7 (notch, 128 Hz) | v8 (no notch, 100 Hz) | Script |
+| Part of the paper | v7 | v8 | Script |
 |---|---|---|---|
-| Table 2, pathways lower with LLM | 8 of 12, -29 to -36%, FDR .006 to .037 | Same 8 of 12, -30 to -34%, FDR .001 to .027 | `v7_4_ddtf_runs.py`, `v7_5_ddtf_wallas_stats.py` |
-| Strongest pathway | Alpha occipital to frontal, chi2 = 19.53 | Theta occipital to frontal, chi2 = 22.74, and alpha, chi2 = 22.11 | same |
-| Frontal-origin pathways | FDR >= .81 | FDR >= .66 | same |
-| PCA check | Occipital to parietal, alpha chi2 = 16.92 and theta 16.43, FDR .015 | Occipital to parietal, alpha chi2 = 18.91 and theta 17.64, FDR .009 (still the only 2 of 12 below .05) | same, `--roi pca` |
-| Unstable windows | 54 of 12,648 | 49 of 12,648 | `23_ddtf_stagewise.py` |
-| Model order | AIC 5 (39 ms), BIC 3, N = 512 samples | AIC 5 (50 ms), BIC 2, N = 400 samples | `23_ddtf_stagewise.py --aic` (BIC from the same fits) |
-| ERP cluster (F3, C3, P3, -450 to -297 ms) | p = .039 | p = .037. Means, dz = -0.70, 13 of 15 and the held-out 13 of 15 do not change | `v7_1_erp_cluster_heldout.py` |
+| Table 2 | Ours, N = 14, notch, 128 Hz, order 5, theta + alpha: 8 of 12, -29 to -36%, FDR .006 to .037 | Athena's, N = 19, no notch, 100 Hz, order 10, theta + alpha + beta: 8 of 18, -18 to -30%, FDR .003 to .025 | `v8_her_ddtf.py` |
+| Which pathways | All 8 from parietal or occipital, incl. parietal to frontal | Parietal to occipital and occipital to parietal in all three bands, occipital to frontal in theta and alpha. Parietal to frontal FDR >= .53, beta occipital to frontal .13 | same |
+| Frontal-origin pathways | FDR >= .81 | FDR >= .24 (6 tests) | same |
+| Same at AIC order 5 | - | Same 8 pathways, FDR .003 to .026 | `ORDER=aic` |
+| Stage-wise Wilcoxon (32 tests, not in the paper) | not reported | None below .05 after FDR (smallest .11) | cell 31 |
+| PCA check | Ours: occipital to parietal, alpha and theta, FDR .015 | Athena's: all 6 parietal <-> occipital pathways, -26 to -34%, FDR <= .006. Frontal PCA follows the electrodes nearest the eyes (Fp1 + Fp2 carry more than half the weight in 8 of 19, a single F7 or F8 in 5 more, `v8_pca_frontal_weights.py`), so frontal pathways are reported from averages only | `ROI=pca` |
+| Notch check (not in the paper) | - | With the v7 notch (`NOTCH=1`) the same 8 pathways, every chi2 within 0.01 | `NOTCH=1` |
+| Laplacian check (reference-free, extra, not in the paper) | - | 6 of 18, all lower with the LLM: occipital to frontal theta and alpha (-27%), parietal to frontal theta and alpha (-26 to -28%), frontal to parietal alpha and beta (-21 to -22%), FDR .003 to .009. Parietal <-> occipital no longer differs (FDR >= .35) | `CSD=1` (`csd_patch.py`) |
+| Unstable windows | 54 of 12,648 | 61 of 13,881 | same |
+| Model order | AIC 5 (39 ms), BIC 3, N = 512 | Used 10 (100 ms). AIC 5, BIC 2, N = 400 | same |
+| Fig 7 (brain networks) | v06 figure (theta, alpha) | Redrawn by her cell 32, theta, alpha and beta rows | `FIG=1` |
+| Fig 8 (schematic) | 2 bands | 3 bands | `v8_ddtf_schematic.py` |
+| ERP cluster neighbours | Channels next to each other in the data file (MNE `adjacency=None`), search -0.5 to 0.5 s: F3 C3 P3, p = .039 (notch) / .037 | Spatial neighbours (Delaunay triangulation, `find_ch_adjacency`), search -0.5 to 0 s: F3 T7 C3 Cz C4 P7 P3 Pz, -450 to -297 ms, p = .029 (.080 over -0.5 to 0.5 s, not in the paper). No neighbours: F3 only, p = .032. Notch: .030 | `v8_erp_spatial.py` |
+| ERP cluster summary | F3 C3 P3: 13 of 15, Wilcoxon p = .0004, dz = -0.70 | 8 cluster channels: +2.72 vs -2.56 uV, 13 of 15, Wilcoxon p = .0006, dz = -0.70 | same |
+| ERP leave-one-out | 13 of 15, p = .0004 | 10 of 15, Wilcoxon p = .010 (same spatial test on each 14) | same |
+| Non-insight control | F3 C3 P3: W = 47, p = .49, 4.0% of draws, clusters .16 / .29 | 8 cluster channels: W = 54, p = .76, 4.4% of draws, no draw as large as the aha difference, clusters .21 / .16 | `07_noninsight_control.py` with `ROI_CH` |
 | After-aha power | FDR .030 | FDR .030 (the notch never touched it) | your `erp_tfr_tf_cluster_pre_event.py` |
+| Pre-aha power (new, Appendix B) | - | Aha vs 40 random moments per recording, Morlet as yours: theta higher before the aha in both conditions, frontal, central, parietal, occipital, FDR .005 to .016, frontal 1-7 Hz cluster -1.18 to -0.58 s, p = .003. No LLM difference (FDR >= .38). Not significant against each epoch's own -5 to -4 s | `v8_pre_aha_power.py`, `v8_pre_aha_power_stats.py`, `v8_fig_pre_aha_power.py` |
 
-Check: Table 2 at 100 Hz with the notch (`NOTCH=1`) gives the same 8 pathways. Every chi2 is within 0.01 of the no-notch value, so at 100 Hz the notch no longer matters.
+Not in the paper, kept here as checks: the Laplacian, the notch runs, the -0.5 to 0.5 s ERP search, the stage-wise Wilcoxon tests, the residual whiteness numbers, and the pre-aha power against each epoch's own -5 to -4 s.
 
-New reference numbers: `reference/table2_ddtf_wallas_100hz_nonotch.json` (same layout as `reference/v7_table2_ddtf_wallas.json`).
+Run (paths are examples):
 
-To get the v7 numbers back: `NOTCH=1 FS_NEW=128 python v7_4_ddtf_runs.py`, and `NOTCH=1 python v7_1_erp_cluster_heldout.py`.
+```
+export EEG_DATA=/path/to/cleaned CODING_CSV=/path/to/creativitycodings.csv
+OUT=out/main ORDER=10 FIG=1 python v8_her_ddtf.py      # Table 2, Fig 7
+OUT=out/aic ORDER=aic python v8_her_ddtf.py            # order 5 check
+OUT=out/pca ORDER=10 ROI=pca python v8_her_ddtf.py     # PCA check
+OUT=out/pca python v8_pca_frontal_weights.py           # which electrodes carry each PCA region signal
+OUT=out/notch OUT_DIR=<folder with meeting_1013/22a_line_noise_per_file.csv> NOTCH=1 python v8_her_ddtf.py
+python v8_ddtf_schematic.py out/main/tests.csv fig_ddtf_wallas_schematic.png   # Fig 8
+
+OUT_DIR=out/erp python 03_erp_cluster.py                      # participant ERPs (no notch)
+OUT_DIR=out/erp python v8_erp_spatial.py                      # ERP test, summary, leave-one-out, checks
+export ROI_CH=P3,C3,F3,C4,Cz,T7,P7,Pz
+OUT_DIR=out/erp python 07_noninsight_control.py && OUT_DIR=out/erp TMAX=0 python 04_fig_erp.py && OUT_DIR=out/erp TMAX=0 python 08_fig_noninsight.py
+OUT_DIR=out/erp python v8_fig_erp_neighbours.py                # neighbour figure (not in the paper)
+OUT=out/csd ORDER=10 CSD=1 python v8_her_ddtf.py               # Laplacian check (not in the paper)
+OUT=out/pre python v8_pre_aha_power.py && MAPS=out/pre/maps_v2.npz python v8_pre_aha_power_stats.py
+MAPS=out/pre/maps_v2.npz STATS=out/pre/pre_aha_power_stats.json FIG=fig_pre_aha_power python v8_fig_pre_aha_power.py   # panel B pooled over conditions (POOLED=0 splits them)
+```
+
+Each run writes tests.csv (the 18 tests), unit.csv, coverage.csv, order_selection.csv (mean AIC and BIC for orders 1-20), posthoc.csv (stage-wise Wilcoxon) and summary.json. Reference numbers: `reference/table2_v8/`.
+
+Our stage-aligned version (`v7_4_ddtf_runs.py`, `v7_5_ddtf_wallas_stats.py`) still runs and is kept as a check. Its no-notch 100 Hz numbers are in `reference/table2_ddtf_wallas_100hz_nonotch.json`. To get the v7 numbers back: `NOTCH=1 FS_NEW=128 python v7_4_ddtf_runs.py`.
 
 Other code changes:
 - `v7_ddtf_wrapper.py`: the notch is used only with `NOTCH=1`. `EEG_BASELINES` (optional) sets the rest-recording folder.
-- `23_ddtf_stagewise.py`: default rate is 100 Hz (`FS_NEW` changes it). With `--segments wallas` it now writes the windows and stops, because its quick stats crashed when someone had only one condition in the coded stages (P11, P21, P23). The Table 2 statistics were always computed by `v7_5_ddtf_wallas_stats.py`, so v7 numbers are not affected.
+- `23_ddtf_stagewise.py`: default rate is 100 Hz (`FS_NEW` changes it). With `--segments wallas` it now writes the windows and stops, because its quick stats crashed when someone had only one condition in the coded stages (P11, P21, P23). The Table 2 statistics of that version were always computed by `v7_5_ddtf_wallas_stats.py`, so v7 numbers are not affected.

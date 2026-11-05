@@ -1,0 +1,439 @@
+{
+ "seed": 20261006,
+ "n_draws": 1000,
+ "N": 15,
+ "epochs_per_condition": {
+  "control": 116,
+  "treatment": 73
+ },
+ "C_a": {
+  "unassisted_mean_uV": -0.00599719537422061,
+  "unassisted_sd": 0.0411648191511631,
+  "llm_mean_uV": 0.009812815114855766,
+  "llm_sd": 0.08838246762752533,
+  "diff_U_minus_LLM_mean": -0.015810009092092514,
+  "diff_sd": 0.08783196657896042,
+  "dz_U_minus_LLM": -0.18000289797782898,
+  "W": 54.0,
+  "p": 0.76153564453125,
+  "n_llm_more_positive": 7,
+  "paired_t": -0.6971482634544373,
+  "paired_t_p": 0.49712392687797546
+ },
+ "aha_reference": {
+  "unassisted_mean_uV": -2.564777876359491,
+  "llm_mean_uV": 2.718959404908991,
+  "W": 5.0,
+  "p": 0.0006103515625,
+  "dz": -0.7011561886472104
+ },
+ "extra_not_prespecified_interaction": {
+  "mean": -5.267927271741772,
+  "W": 6.0,
+  "p": 0.0008544921875
+ },
+ "extra_roi_aha_vs_noninsight_control": {
+  "aha_mean": -2.564777876359491,
+  "noninsight_mean": -0.00599719537422061,
+  "W": 25.0,
+  "p": 0.04791259765625
+ },
+ "extra_roi_aha_vs_noninsight_treatment": {
+  "aha_mean": 2.718959404908991,
+  "noninsight_mean": 0.009812815114855766,
+  "W": 19.0,
+  "p": 0.01806640625
+ },
+ "C_b": {
+  "pct_p_lt_05": 4.3999999999999995,
+  "pct_p_lt_05_aha_direction": 2.5,
+  "pct_p_lt_05_opposite_direction": 1.9,
+  "median_p": 0.52447509765625,
+  "p_q025_q975": [
+   0.0301513671875,
+   0.97796630859375
+  ],
+  "median_W": 48.0,
+  "mean_diff_U_minus_LLM_median": -0.009238155791535974,
+  "mean_diff_q025_q975": [
+   -1.8097383379936218,
+   1.904937890172004
+  ],
+  "aha_mean_diff": -5.283737281268483,
+  "pct_draws_mean_diff_as_negative_as_aha": 0.0
+ },
+ "C_d": {
+  "Unassisted": {
+   "S_spatial_19ch_pre": {
+    "n_clusters": 24,
+    "top": [
+     {
+      "p": 0.21246337890625,
+      "t_start": -0.08333333333333333,
+      "t_end": -0.04666666666666667,
+      "channels": [
+       "C4",
+       "P4",
+       "T8",
+       "Pz"
+      ],
+      "mean_T": 2.600419311596514,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.8770751953125,
+      "t_start": -0.16333333333333333,
+      "t_end": -0.15666666666666668,
+      "channels": [
+       "C4",
+       "P4"
+      ],
+      "mean_T": -2.5021723786205374,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.9102783203125,
+      "t_start": -0.09333333333333334,
+      "t_end": -0.09,
+      "channels": [
+       "C4",
+       "Cz"
+      ],
+      "mean_T": 2.867830512056057,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.9630126953125,
+      "t_start": -0.15,
+      "t_end": -0.14666666666666667,
+      "channels": [
+       "C4",
+       "P4"
+      ],
+      "mean_T": -2.3157266077722922,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.970458984375,
+      "t_start": -0.10666666666666667,
+      "t_end": -0.1,
+      "channels": [
+       "T8"
+      ],
+      "mean_T": 2.9532254533339604,
+      "sign": "aha > non-insight"
+     }
+    ]
+   },
+   "M_mne_adjacency_19ch": {
+    "n_clusters": 47,
+    "top": [
+     {
+      "p": 0.3631591796875,
+      "t_start": -0.08333333333333333,
+      "t_end": -0.04666666666666667,
+      "channels": [
+       "C4",
+       "P4",
+       "T8",
+       "Pz"
+      ],
+      "mean_T": 2.6004193115965144,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.37738037109375,
+      "t_start": 0.39,
+      "t_end": 0.46,
+      "channels": [
+       "F8"
+      ],
+      "mean_T": -2.398136909305982,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.91259765625,
+      "t_start": 0.48,
+      "t_end": 0.5,
+      "channels": [
+       "F7"
+      ],
+      "mean_T": -2.2908882266504165,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.920166015625,
+      "t_start": 0.3433333333333333,
+      "t_end": 0.36333333333333334,
+      "channels": [
+       "F8"
+      ],
+      "mean_T": -2.220246847241707,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.94482421875,
+      "t_start": 0.4533333333333333,
+      "t_end": 0.47,
+      "channels": [
+       "F7"
+      ],
+      "mean_T": -2.336534954217105,
+      "sign": "aha < non-insight"
+     }
+    ]
+   },
+   "R_repo_lattice_21ch": {
+    "n_clusters": 46,
+    "top": [
+     {
+      "p": 0.178955078125,
+      "t_start": 0.39,
+      "t_end": 0.47,
+      "channels": [
+       "F7",
+       "F8"
+      ],
+      "mean_T": -2.355152010502663,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.35382080078125,
+      "t_start": -0.08333333333333333,
+      "t_end": -0.04666666666666667,
+      "channels": [
+       "C4",
+       "P4"
+      ],
+      "mean_T": 2.6356510182930686,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.57586669921875,
+      "t_start": 0.47333333333333333,
+      "t_end": 0.5,
+      "channels": [
+       "F7",
+       "F8"
+      ],
+      "mean_T": -2.299439985085614,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.90252685546875,
+      "t_start": 0.3433333333333333,
+      "t_end": 0.36333333333333334,
+      "channels": [
+       "F8"
+      ],
+      "mean_T": -2.220246847241707,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.9539794921875,
+      "t_start": -0.16333333333333333,
+      "t_end": -0.15666666666666668,
+      "channels": [
+       "C4",
+       "P4"
+      ],
+      "mean_T": -2.5021723786205374,
+      "sign": "aha < non-insight"
+     }
+    ]
+   }
+  },
+  "LLM-assisted": {
+   "S_spatial_19ch_pre": {
+    "n_clusters": 47,
+    "top": [
+     {
+      "p": 0.16265869140625,
+      "t_start": -0.3933333333333333,
+      "t_end": -0.33,
+      "channels": [
+       "C3",
+       "F3",
+       "T7",
+       "F7"
+      ],
+      "mean_T": 2.6069660466576723,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.2242431640625,
+      "t_start": -0.36,
+      "t_end": -0.30333333333333334,
+      "channels": [
+       "O1",
+       "O2"
+      ],
+      "mean_T": -2.893703785939875,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.31951904296875,
+      "t_start": -0.43,
+      "t_end": -0.4,
+      "channels": [
+       "P3",
+       "C3",
+       "F3",
+       "P7"
+      ],
+      "mean_T": 3.006862693044185,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.81414794921875,
+      "t_start": -0.25333333333333335,
+      "t_end": -0.24,
+      "channels": [
+       "C3",
+       "F7"
+      ],
+      "mean_T": 2.8094362596419913,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.8477783203125,
+      "t_start": -0.29,
+      "t_end": -0.2833333333333333,
+      "channels": [
+       "C3",
+       "T7",
+       "F7"
+      ],
+      "mean_T": 2.587875358910076,
+      "sign": "aha > non-insight"
+     }
+    ]
+   },
+   "M_mne_adjacency_19ch": {
+    "n_clusters": 62,
+    "top": [
+     {
+      "p": 0.360595703125,
+      "t_start": -0.3933333333333333,
+      "t_end": -0.33,
+      "channels": [
+       "C3",
+       "F3",
+       "T7",
+       "F7"
+      ],
+      "mean_T": 2.6069660466576723,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.45635986328125,
+      "t_start": -0.36,
+      "t_end": -0.30333333333333334,
+      "channels": [
+       "O1",
+       "O2"
+      ],
+      "mean_T": -2.893703785939875,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.5701904296875,
+      "t_start": -0.43,
+      "t_end": -0.4,
+      "channels": [
+       "P3",
+       "C3",
+       "F3",
+       "P7"
+      ],
+      "mean_T": 3.0068626930441846,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.943359375,
+      "t_start": -0.25333333333333335,
+      "t_end": -0.24,
+      "channels": [
+       "C3",
+       "F7"
+      ],
+      "mean_T": 2.809436259641991,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.95794677734375,
+      "t_start": -0.29,
+      "t_end": -0.2833333333333333,
+      "channels": [
+       "C3",
+       "T7",
+       "F7"
+      ],
+      "mean_T": 2.587875358910076,
+      "sign": "aha > non-insight"
+     }
+    ]
+   },
+   "R_repo_lattice_21ch": {
+    "n_clusters": 88,
+    "top": [
+     {
+      "p": 0.307373046875,
+      "t_start": -0.3933333333333333,
+      "t_end": -0.33,
+      "channels": [
+       "C3",
+       "F3"
+      ],
+      "mean_T": 2.630641283549088,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.335693359375,
+      "t_start": -0.5,
+      "t_end": -0.43,
+      "channels": [
+       "A1"
+      ],
+      "mean_T": 2.90129147021816,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.37969970703125,
+      "t_start": -0.36,
+      "t_end": -0.30333333333333334,
+      "channels": [
+       "O1",
+       "O2"
+      ],
+      "mean_T": -2.893703785939875,
+      "sign": "aha < non-insight"
+     },
+     {
+      "p": 0.52020263671875,
+      "t_start": -0.43,
+      "t_end": -0.4,
+      "channels": [
+       "P3",
+       "C3",
+       "F3"
+      ],
+      "mean_T": 3.0419180191694366,
+      "sign": "aha > non-insight"
+     },
+     {
+      "p": 0.94744873046875,
+      "t_start": -0.45,
+      "t_end": -0.44,
+      "channels": [
+       "C3",
+       "F3"
+      ],
+      "mean_T": 2.42818614606491,
+      "sign": "aha > non-insight"
+     }
+    ]
+   }
+  }
+ }
+}
