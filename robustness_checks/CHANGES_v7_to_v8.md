@@ -16,7 +16,7 @@ Connectivity (Table 2 and the text around it) changed in three ways, and the ERP
 | Stage-wise Wilcoxon (32 tests) | not reported | None below .05 after FDR (smallest .11) | cell 31 |
 | PCA check | Ours: occipital to parietal, alpha and theta, FDR .015 | Athena's: all 6 parietal <-> occipital pathways, -26 to -34%, FDR <= .006. Frontal PCA is eye-dominated, so frontal pathways are reported from averages only | `ROI=pca` |
 | Notch check | - | With the v7 notch (`NOTCH=1`) the same 8 pathways, every chi2 within 0.01 | `NOTCH=1` |
-| Laplacian check (reference-free) | - | 6 of 18, all lower with the LLM: occipital to frontal theta and alpha (-27%), parietal to frontal theta and alpha (-26 to -28%), frontal to parietal alpha and beta (-21 to -22%), FDR .003 to .009. Parietal <-> occipital no longer differs (FDR >= .35) | `CSD=1` (`csd_patch.py`) |
+| Laplacian check (reference-free, extra, not in the paper) | - | 6 of 18, all lower with the LLM: occipital to frontal theta and alpha (-27%), parietal to frontal theta and alpha (-26 to -28%), frontal to parietal alpha and beta (-21 to -22%), FDR .003 to .009. Parietal <-> occipital no longer differs (FDR >= .35) | `CSD=1` (`csd_patch.py`) |
 | Unstable windows | 54 of 12,648 | 61 of 13,881 | same |
 | Model order | AIC 5 (39 ms), BIC 3, N = 512 | Used 10 (100 ms). AIC 5, BIC 2, N = 400 | same |
 | Fig 7 (brain networks) | v06 figure (theta, alpha) | Redrawn by her cell 32, theta, alpha and beta rows | `FIG=1` |
@@ -43,7 +43,7 @@ OUT_DIR=out/erp python v8_erp_spatial.py                      # ERP test, summar
 export ROI_CH=P3,C3,F3,C4,Cz,T7,P7,Pz
 OUT_DIR=out/erp python 07_noninsight_control.py && OUT_DIR=out/erp python 04_fig_erp.py && OUT_DIR=out/erp python 08_fig_noninsight.py
 OUT_DIR=out/erp python v8_fig_erp_neighbours.py                # appendix figure
-OUT=out/csd ORDER=10 CSD=1 python v8_her_ddtf.py               # Laplacian check
+OUT=out/csd ORDER=10 CSD=1 python v8_her_ddtf.py               # Laplacian check (not in the paper)
 OUT=out/pre python v8_pre_aha_power.py && MAPS=out/pre/maps_v2.npz python v8_pre_aha_power_stats.py
 MAPS=out/pre/maps_v2.npz FIG=fig_pre_aha_power python v8_fig_pre_aha_power.py
 ```

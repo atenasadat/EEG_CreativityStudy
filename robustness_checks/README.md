@@ -18,7 +18,7 @@ Paths are in `config.py`. By default they follow your own `ERP/erp_shared.py` (`
 | `01_inventory.py`, `02_counts_time.py`, `02b_aha_rate.py`, `05_fig_behaviour.py` | Aha counts, aha rate per 10 min, time on task, and the 3-panel behavior figure | Fig. 1, behavior results |
 | `03_erp_cluster.py`, `04_fig_erp.py` | Participant-level ERPs, cluster test and the ERP figure | Fig. 2 |
 | `v8_pre_aha_power.py`, `v8_pre_aha_power_stats.py`, `v8_fig_pre_aha_power.py` | Power before the aha vs random moments (Richard's ask), your Morlet settings | Pre-insight power results and figure |
-| `csd_patch.py` | Surface Laplacian at read time (`CSD=1` in `v8_her_ddtf.py`) | Laplacian check of Table 2 |
+| `csd_patch.py` | Surface Laplacian at read time (`CSD=1` in `v8_her_ddtf.py`) | Laplacian check of Table 2 (extra check, not in the paper) |
 | `v8_erp_spatial.py`, `v8_fig_erp_neighbours.py` | ERP cluster test with spatial neighbours (Delaunay) and the search before the aha, cluster summary, leave-one-out, no-neighbour and notch checks, and the neighbour figure | ERP results, Fig 2 channels, appendix B |
 | `v7_1_erp_cluster_heldout.py` | The same cluster test (no notch, `NOTCH=1` for the v7 version), plus the leave-one-participant-out window check (13 of 15) | ERP results, v7 |
 | `07_noninsight_control.py`, `08_fig_noninsight.py`, `11_noninsight_cd_lattice19.py` | Random non-insight moments, count-matched, 1,000 draws | Fig. 3, non-insight control |
